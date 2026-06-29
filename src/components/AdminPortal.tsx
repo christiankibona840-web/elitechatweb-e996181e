@@ -175,7 +175,9 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
   };
 
   const blockUser = async (userId: string, displayName: string) => {
-    const { error } = await supabase.from('blocked_users').insert({ blocker_id: (await supabase.auth.getUser()).data.user?.id, blocked_id: userId });
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('blocked_users').insert({ blocker_id: user.id, blocked_id: userId });
     if (error) {
       toast({ title: 'Error blocking user', description: error.message, variant: 'destructive' });
     } else {
