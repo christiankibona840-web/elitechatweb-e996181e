@@ -871,8 +871,8 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
                           <textarea
                             autoFocus
                             spellCheck
-                            value={editingMsg.content}
-                            onChange={(e) => setEditingMsg({ ...editingMsg, content: e.target.value })}
+                            value={editingMsg!.content}
+                            onChange={(e) => setEditingMsg((prev) => prev ? { ...prev, content: e.target.value } : prev)}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveEdit(); }
                               if (e.key === 'Escape') setEditingMsg(null);
