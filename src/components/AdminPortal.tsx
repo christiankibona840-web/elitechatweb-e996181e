@@ -107,11 +107,12 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
     }
     setPublishingAnnouncement(true);
     const { data: { user } } = await supabase.auth.getUser();
-    const { data: profile } = await supabase.from('profiles').select('display_name, avatar_url').eq('id', user?.id).single();
+    if (!user) { setPublishingAnnouncement(false); return; }
+    const { data: profile } = await supabase.from('profiles').select('display_name, avatar_url').eq('id', user.id).single();
     const { error } = await supabase.from('announcements').insert({
       title: announcementTitle.trim(),
       content: announcementContent.trim(),
-      admin_id: user?.id,
+      admin_id: user.id,
       admin_name: profile?.display_name || 'Admin',
       admin_avatar: profile?.avatar_url || null,
     });
