@@ -270,43 +270,51 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="bg-gradient-hero border-b border-accent/30 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-elegant">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full bg-gradient-gold flex items-center justify-center shadow-gold ring-2 ring-accent/40">
-            <Shield size={20} className="text-accent-foreground" />
+      <header className="bg-gradient-hero border-b border-accent/30 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-10 shadow-elegant">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-gradient-gold flex items-center justify-center shadow-gold ring-2 ring-accent/40">
+              <Shield size={18} className="text-accent-foreground" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-display text-base sm:text-xl font-bold text-brand-light tracking-tight truncate">YST Admin Portal</h1>
+              <p className="text-[10px] sm:text-xs text-brand-light/70 truncate">Full control over users & settings</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-display text-xl font-bold text-brand-light tracking-tight">YST Admin Portal</h1>
-            <p className="text-xs text-brand-light/70">Full control over users & settings</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {onBackToChoice && (
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            {onBackToChoice && (
+              <button
+                onClick={onBackToChoice}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs sm:text-sm"
+              >
+                💬 <span className="hidden sm:inline">Back to Chats</span>
+              </button>
+            )}
             <button
-              onClick={onBackToChoice}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm"
+              onClick={() => setShowCreateUser(true)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-gradient-gold text-accent-foreground hover:shadow-gold-strong transition-all text-xs sm:text-sm font-semibold"
             >
-              💬 Back to Chats
+              <UserPlus size={16} /> <span className="hidden sm:inline">Create User</span>
             </button>
-          )}
-          <button
-            onClick={() => setShowPasswordForm(!showPasswordForm)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-accent transition-colors text-sm"
-          >
-            <KeyRound size={16} />
-            Change Password
-          </button>
-          <button
-            onClick={onLogout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
+            <button
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-accent transition-colors text-xs sm:text-sm"
+            >
+              <KeyRound size={16} />
+              <span className="hidden sm:inline">Change Password</span>
+            </button>
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-xs sm:text-sm"
+            >
+              <LogOut size={16} />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto p-4 sm:p-6">
         {/* Password change form */}
         {showPasswordForm && (
           <div className="bg-card border border-border rounded-xl p-5 mb-6">
