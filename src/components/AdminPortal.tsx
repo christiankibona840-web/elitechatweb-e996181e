@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useServerFn } from '@tanstack/react-router';
+import { useServerFn } from '@tanstack/react-start';
 import { supabase } from '@/integrations/supabase/client';
 import { Trash2, LogOut, Shield, Users, Search, KeyRound, Ban, CheckCircle, MessageCircle, Megaphone, Hash, Users2, AlertTriangle, UserPlus, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
