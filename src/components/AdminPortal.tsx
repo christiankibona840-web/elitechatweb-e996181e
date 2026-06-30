@@ -336,7 +336,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <div className="bg-card border border-border rounded-xl p-4 hover:border-accent/40 transition-colors">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center">
