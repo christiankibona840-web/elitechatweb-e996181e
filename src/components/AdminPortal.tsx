@@ -734,6 +734,81 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
           onClose={() => { setCommunitiesFor(null); loadUsers(); }}
         />
       )}
+
+      {/* Create user modal */}
+      {showCreateUser && (
+        <div className="fixed inset-0 bg-black/70 z-[70] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md p-5 sm:p-6 my-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-base flex items-center gap-2">
+                <UserPlus size={18} className="text-accent" /> Create User
+              </h3>
+              <button onClick={() => setShowCreateUser(false)} className="text-muted-foreground hover:text-foreground">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-muted-foreground">Email</label>
+                <input type="email" value={newUser.email}
+                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                  placeholder="user@example.com"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary mt-1" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Password (min 6 chars)</label>
+                <input type="text" value={newUser.password}
+                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                  placeholder="••••••"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary mt-1" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Member ID (e.g. #360-001)</label>
+                <input value={newUser.member_id}
+                  onChange={e => setNewUser({ ...newUser, member_id: e.target.value.toUpperCase() })}
+                  placeholder="#360-001"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm font-mono outline-none focus:border-primary mt-1" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">Username (optional)</label>
+                  <input value={newUser.username}
+                    onChange={e => setNewUser({ ...newUser, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20) })}
+                    placeholder="auto"
+                    className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm font-mono outline-none focus:border-primary mt-1" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Display name (optional)</label>
+                  <input value={newUser.display_name}
+                    onChange={e => setNewUser({ ...newUser, display_name: e.target.value })}
+                    placeholder="auto"
+                    className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary mt-1" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 pt-1">
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={newUser.make_admin}
+                    onChange={e => setNewUser({ ...newUser, make_admin: e.target.checked })} />
+                  Grant <span className="font-semibold">Admin</span> role
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={newUser.make_reel_manager}
+                    onChange={e => setNewUser({ ...newUser, make_reel_manager: e.target.checked })} />
+                  Grant <span className="font-semibold">Reel Manager</span> role
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end mt-5">
+              <button onClick={() => setShowCreateUser(false)} disabled={creating}
+                className="px-4 py-2 text-sm rounded-lg hover:bg-muted disabled:opacity-50">Cancel</button>
+              <button onClick={submitCreateUser} disabled={creating || !newUser.email || !newUser.password || !newUser.member_id}
+                className="px-4 py-2 text-sm rounded-lg bg-gradient-gold text-accent-foreground font-semibold hover:shadow-gold-strong disabled:opacity-50">
+                {creating ? 'Creating…' : 'Create user'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
