@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useServerFn } from '@tanstack/react-router';
 import { supabase } from '@/integrations/supabase/client';
-import { Trash2, LogOut, Shield, Users, Search, KeyRound, Ban, CheckCircle, MessageCircle, Megaphone, Hash, Users2, AlertTriangle } from 'lucide-react';
+import { Trash2, LogOut, Shield, Users, Search, KeyRound, Ban, CheckCircle, MessageCircle, Megaphone, Hash, Users2, AlertTriangle, UserPlus, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import ApprovedIdsPanel from './admin/ApprovedIdsPanel';
 import GroupsPanel from './admin/GroupsPanel';
 import UserCommunitiesModal from './admin/UserCommunitiesModal';
+import { adminCreateUser } from '@/lib/admin-users.functions';
 
 interface AdminUser {
   id: string;
