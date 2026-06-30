@@ -47,6 +47,25 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
   const [assigningId, setAssigningId] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<AdminUser | null>(null);
   const [communitiesFor, setCommunitiesFor] = useState<AdminUser | null>(null);
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newUser, setNewUser] = useState({ email: '', password: '', member_id: '', username: '', display_name: '', make_admin: false, make_reel_manager: false });
+  const createUserFn = useServerFn(adminCreateUser);
+
+  const submitCreateUser = async () => {
+    setCreating(true);
+    try {
+      const res = await createUserFn({ data: { ...newUser } });
+      toast({ title: 'User created', description: `${res.email} · ${res.member_id}` });
+      setShowCreateUser(false);
+      setNewUser({ email: '', password: '', member_id: '', username: '', display_name: '', make_admin: false, make_reel_manager: false });
+      loadUsers(true);
+    } catch (e: any) {
+      toast({ title: 'Could not create user', description: e?.message || 'Unknown error', variant: 'destructive' });
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const validateUsername = (u: string): string | null => {
     if (u.length < 3 || u.length > 20) return 'Must be 3-20 characters';
