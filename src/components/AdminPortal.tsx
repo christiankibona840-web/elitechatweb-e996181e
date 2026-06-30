@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useServerFn } from '@tanstack/react-start';
 import { supabase } from '@/integrations/supabase/client';
-import { Trash2, LogOut, Shield, Users, Search, KeyRound, Ban, CheckCircle, MessageCircle, Megaphone, Hash, Users2, AlertTriangle } from 'lucide-react';
+import { Trash2, LogOut, Shield, Users, Search, KeyRound, Ban, CheckCircle, MessageCircle, Megaphone, Hash, Users2, AlertTriangle, UserPlus, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import ApprovedIdsPanel from './admin/ApprovedIdsPanel';
 import GroupsPanel from './admin/GroupsPanel';
 import UserCommunitiesModal from './admin/UserCommunitiesModal';
+import { adminCreateUser } from '@/lib/admin-users.functions';
 
 interface AdminUser {
   id: string;
@@ -45,6 +47,25 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
   const [assigningId, setAssigningId] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<AdminUser | null>(null);
   const [communitiesFor, setCommunitiesFor] = useState<AdminUser | null>(null);
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newUser, setNewUser] = useState({ email: '', password: '', member_id: '', username: '', display_name: '', make_admin: false, make_reel_manager: false });
+  const createUserFn = useServerFn(adminCreateUser);
+
+  const submitCreateUser = async () => {
+    setCreating(true);
+    try {
+      const res = await createUserFn({ data: { ...newUser } });
+      toast({ title: 'User created', description: `${res.email} · ${res.member_id}` });
+      setShowCreateUser(false);
+      setNewUser({ email: '', password: '', member_id: '', username: '', display_name: '', make_admin: false, make_reel_manager: false });
+      loadUsers(true);
+    } catch (e: any) {
+      toast({ title: 'Could not create user', description: e?.message || 'Unknown error', variant: 'destructive' });
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const validateUsername = (u: string): string | null => {
     if (u.length < 3 || u.length > 20) return 'Must be 3-20 characters';
@@ -249,43 +270,51 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="bg-gradient-hero border-b border-accent/30 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-elegant">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full bg-gradient-gold flex items-center justify-center shadow-gold ring-2 ring-accent/40">
-            <Shield size={20} className="text-accent-foreground" />
+      <header className="bg-gradient-hero border-b border-accent/30 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-10 shadow-elegant">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-gradient-gold flex items-center justify-center shadow-gold ring-2 ring-accent/40">
+              <Shield size={18} className="text-accent-foreground" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-display text-base sm:text-xl font-bold text-brand-light tracking-tight truncate">YST Admin Portal</h1>
+              <p className="text-[10px] sm:text-xs text-brand-light/70 truncate">Full control over users & settings</p>
+            </div>
           </div>
-          <div>
-            <h1 className="font-display text-xl font-bold text-brand-light tracking-tight">YST Admin Portal</h1>
-            <p className="text-xs text-brand-light/70">Full control over users & settings</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {onBackToChoice && (
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            {onBackToChoice && (
+              <button
+                onClick={onBackToChoice}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-xs sm:text-sm"
+              >
+                💬 <span className="hidden sm:inline">Back to Chats</span>
+              </button>
+            )}
             <button
-              onClick={onBackToChoice}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm"
+              onClick={() => setShowCreateUser(true)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-gradient-gold text-accent-foreground hover:shadow-gold-strong transition-all text-xs sm:text-sm font-semibold"
             >
-              💬 Back to Chats
+              <UserPlus size={16} /> <span className="hidden sm:inline">Create User</span>
             </button>
-          )}
-          <button
-            onClick={() => setShowPasswordForm(!showPasswordForm)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-accent transition-colors text-sm"
-          >
-            <KeyRound size={16} />
-            Change Password
-          </button>
-          <button
-            onClick={onLogout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
+            <button
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-accent transition-colors text-xs sm:text-sm"
+            >
+              <KeyRound size={16} />
+              <span className="hidden sm:inline">Change Password</span>
+            </button>
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-xs sm:text-sm"
+            >
+              <LogOut size={16} />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto p-4 sm:p-6">
         {/* Password change form */}
         {showPasswordForm && (
           <div className="bg-card border border-border rounded-xl p-5 mb-6">
@@ -307,7 +336,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <div className="bg-card border border-border rounded-xl p-4 hover:border-accent/40 transition-colors">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center">
@@ -704,6 +733,81 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
           username={communitiesFor.username}
           onClose={() => { setCommunitiesFor(null); loadUsers(); }}
         />
+      )}
+
+      {/* Create user modal */}
+      {showCreateUser && (
+        <div className="fixed inset-0 bg-black/70 z-[70] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md p-5 sm:p-6 my-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-base flex items-center gap-2">
+                <UserPlus size={18} className="text-accent" /> Create User
+              </h3>
+              <button onClick={() => setShowCreateUser(false)} className="text-muted-foreground hover:text-foreground">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-muted-foreground">Email</label>
+                <input type="email" value={newUser.email}
+                  onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                  placeholder="user@example.com"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary mt-1" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Password (min 6 chars)</label>
+                <input type="text" value={newUser.password}
+                  onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                  placeholder="••••••"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary mt-1" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Member ID (e.g. #360-001)</label>
+                <input value={newUser.member_id}
+                  onChange={e => setNewUser({ ...newUser, member_id: e.target.value.toUpperCase() })}
+                  placeholder="#360-001"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm font-mono outline-none focus:border-primary mt-1" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">Username (optional)</label>
+                  <input value={newUser.username}
+                    onChange={e => setNewUser({ ...newUser, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20) })}
+                    placeholder="auto"
+                    className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm font-mono outline-none focus:border-primary mt-1" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Display name (optional)</label>
+                  <input value={newUser.display_name}
+                    onChange={e => setNewUser({ ...newUser, display_name: e.target.value })}
+                    placeholder="auto"
+                    className="w-full bg-input border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary mt-1" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 pt-1">
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={newUser.make_admin}
+                    onChange={e => setNewUser({ ...newUser, make_admin: e.target.checked })} />
+                  Grant <span className="font-semibold">Admin</span> role
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={newUser.make_reel_manager}
+                    onChange={e => setNewUser({ ...newUser, make_reel_manager: e.target.checked })} />
+                  Grant <span className="font-semibold">Reel Manager</span> role
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end mt-5">
+              <button onClick={() => setShowCreateUser(false)} disabled={creating}
+                className="px-4 py-2 text-sm rounded-lg hover:bg-muted disabled:opacity-50">Cancel</button>
+              <button onClick={submitCreateUser} disabled={creating || !newUser.email || !newUser.password || !newUser.member_id}
+                className="px-4 py-2 text-sm rounded-lg bg-gradient-gold text-accent-foreground font-semibold hover:shadow-gold-strong disabled:opacity-50">
+                {creating ? 'Creating…' : 'Create user'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
