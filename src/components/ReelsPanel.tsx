@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Instagram, X } from 'lucide-react';
+import { Film, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Reel {
@@ -8,8 +8,11 @@ interface Reel {
   position: number;
 }
 
+const BUCKET = 'chat-files';
+
 const ReelsPanel = () => {
   const [reels, setReels] = useState<Reel[]>([]);
+  const [signed, setSigned] = useState<Record<string, string>>({});
   const [hidden, setHidden] = useState<boolean>(() => localStorage.getItem('reels-panel-hidden') === '1');
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -19,7 +22,20 @@ const ReelsPanel = () => {
       .select('id, url, position')
       .order('position', { ascending: true })
       .order('created_at', { ascending: true });
-    setReels((data as Reel[]) || []);
+    const list = (data as Reel[]) || [];
+    setReels(list);
+    const map: Record<string, string> = {};
+    await Promise.all(
+      list.map(async (r) => {
+        if (/^https?:\/\//i.test(r.url)) {
+          map[r.id] = r.url;
+        } else {
+          const { data: s } = await supabase.storage.from(BUCKET).createSignedUrl(r.url, 60 * 60 * 24 * 7);
+          if (s?.signedUrl) map[r.id] = s.signedUrl;
+        }
+      })
+    );
+    setSigned(map);
   };
 
   useEffect(() => {
@@ -38,6 +54,28 @@ const ReelsPanel = () => {
     };
   }, []);
 
+  // Auto-play the most-visible reel
+  useEffect(() => {
+    const root = containerRef.current;
+    if (!root) return;
+    const videos = Array.from(root.querySelectorAll('video')) as HTMLVideoElement[];
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const v = e.target as HTMLVideoElement;
+          if (e.intersectionRatio > 0.6) {
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
+        });
+      },
+      { root, threshold: [0, 0.6, 1] }
+    );
+    videos.forEach((v) => io.observe(v));
+    return () => io.disconnect();
+  }, [signed, reels]);
+
   if (hidden) return null;
 
   const hide = () => {
@@ -49,19 +87,11 @@ const ReelsPanel = () => {
   return (
     <aside className="hidden xl:flex flex-col w-[360px] flex-shrink-0 border-l border-border bg-app-header h-screen">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-app-header z-10">
-        <Instagram size={18} className="text-pink-500" />
+        <Film size={18} className="text-pink-500" />
         <h2 className="font-display text-sm font-semibold text-foreground">Latest Reels</h2>
-        <a
-          href="https://www.instagram.com/respect_chf/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="ml-auto text-xs text-primary hover:underline"
-        >
-          @respect_chf
-        </a>
         <button
           onClick={hide}
-          className="ml-1 w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+          className="ml-auto w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
           title="Hide reels panel"
           aria-label="Hide reels panel"
         >
@@ -85,15 +115,18 @@ const ReelsPanel = () => {
               className="snap-start snap-always w-full flex items-center justify-center bg-black"
               style={{ height: 'calc(100vh - 53px)' }}
             >
-              <iframe
-                src={`${r.url}embed`}
-                className="w-full h-full border-0"
-                scrolling="no"
-                allow="encrypted-media"
-                allowFullScreen
-                loading="lazy"
-                title="Instagram reel"
-              />
+              {signed[r.id] ? (
+                <video
+                  src={signed[r.id]}
+                  className="w-full h-full object-contain"
+                  controls
+                  loop
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <div className="text-xs text-white/60">Loading…</div>
+              )}
             </div>
           ))}
         </div>
