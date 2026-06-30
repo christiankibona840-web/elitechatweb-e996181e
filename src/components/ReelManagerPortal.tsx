@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { Instagram, Trash2, ArrowLeft, LogOut, Plus } from 'lucide-react';
+import { Film, Trash2, ArrowLeft, LogOut, Upload } from 'lucide-react';
 
 interface Reel {
   id: string;
-  url: string;
+  url: string; // storage path inside chat-files bucket, or legacy http url
   position: number;
   created_at: string;
 }
@@ -15,29 +15,14 @@ interface Props {
   onBackToChoice?: () => void;
 }
 
-const normalizeReelUrl = (raw: string): string | null => {
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-  // Strip query string + ensure trailing slash, accept reel/reels/p
-  try {
-    const u = new URL(trimmed);
-    if (!u.hostname.includes('instagram.com')) return null;
-    const parts = u.pathname.split('/').filter(Boolean);
-    // Expect ['reel'|'reels'|'p', '<id>']
-    if (parts.length < 2) return null;
-    const kind = parts[0];
-    const id = parts[1];
-    if (!['reel', 'reels', 'p'].includes(kind)) return null;
-    return `https://www.instagram.com/${kind}/${id}/`;
-  } catch {
-    return null;
-  }
-};
+const BUCKET = 'chat-files';
 
 const ReelManagerPortal = ({ onLogout, onBackToChoice }: Props) => {
   const [reels, setReels] = useState<Reel[]>([]);
-  const [newUrl, setNewUrl] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     const { data } = await (supabase as any)
@@ -45,38 +30,76 @@ const ReelManagerPortal = ({ onLogout, onBackToChoice }: Props) => {
       .select('*')
       .order('position', { ascending: true })
       .order('created_at', { ascending: true });
-    setReels((data as Reel[]) || []);
+    const list = (data as Reel[]) || [];
+    setReels(list);
+    // Generate signed URLs for storage paths (skip legacy http URLs)
+    const map: Record<string, string> = {};
+    await Promise.all(
+      list.map(async (r) => {
+        if (/^https?:\/\//i.test(r.url)) {
+          map[r.id] = r.url;
+        } else {
+          const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(r.url, 60 * 60 * 24 * 7);
+          if (signed?.signedUrl) map[r.id] = signed.signedUrl;
+        }
+      })
+    );
+    setPreviews(map);
   };
 
   useEffect(() => { load(); }, []);
 
-  const addReel = async () => {
-    const normalized = normalizeReelUrl(newUrl);
-    if (!normalized) {
-      toast({ title: 'Invalid Instagram URL', description: 'Paste a link like https://www.instagram.com/reel/XXXX/', variant: 'destructive' });
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith('video/')) {
+      toast({ title: 'Invalid file', description: 'Please select a video file.', variant: 'destructive' });
       return;
     }
-    setLoading(true);
+    if (file.size > 100 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Maximum 100MB.', variant: 'destructive' });
+      return;
+    }
+    setUploading(true);
+    setProgress(0);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setLoading(false); return; }
+    if (!user) { setUploading(false); return; }
+
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'mp4';
+    const path = `reels/${user.id}/${crypto.randomUUID()}.${ext}`;
+
+    const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+    if (upErr) {
+      setUploading(false);
+      toast({ title: 'Upload failed', description: upErr.message, variant: 'destructive' });
+      return;
+    }
+    setProgress(100);
+
     const nextPos = reels.length ? Math.max(...reels.map(r => r.position)) + 1 : 1;
     const { error } = await (supabase as any).from('reels').insert({
-      url: normalized,
+      url: path,
       added_by: user.id,
       position: nextPos,
     });
-    setLoading(false);
+    setUploading(false);
+    setProgress(0);
+    if (fileRef.current) fileRef.current.value = '';
     if (error) {
-      toast({ title: 'Could not add reel', description: error.message, variant: 'destructive' });
+      toast({ title: 'Could not save reel', description: error.message, variant: 'destructive' });
       return;
     }
-    setNewUrl('');
-    toast({ title: 'Reel added', description: 'It will appear in the sidebar.' });
+    toast({ title: 'Reel uploaded', description: 'It will appear in the sidebar.' });
     load();
   };
 
-  const deleteReel = async (id: string) => {
-    const { error } = await (supabase as any).from('reels').delete().eq('id', id);
+  const deleteReel = async (r: Reel) => {
+    // Remove from storage if it's a storage path
+    if (!/^https?:\/\//i.test(r.url)) {
+      await supabase.storage.from(BUCKET).remove([r.url]);
+    }
+    const { error } = await (supabase as any).from('reels').delete().eq('id', r.id);
     if (error) {
       toast({ title: 'Delete failed', description: error.message, variant: 'destructive' });
       return;
@@ -99,7 +122,7 @@ const ReelManagerPortal = ({ onLogout, onBackToChoice }: Props) => {
                 <ArrowLeft size={18} />
               </button>
             )}
-            <Instagram size={20} className="text-pink-500" />
+            <Film size={20} className="text-pink-500" />
             <h1 className="font-display text-lg font-semibold">Reel Portal</h1>
           </div>
           <button
@@ -113,28 +136,27 @@ const ReelManagerPortal = ({ onLogout, onBackToChoice }: Props) => {
 
       <main className="mx-auto max-w-4xl px-4 py-6">
         <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <h2 className="font-display text-base font-semibold mb-1">Add Instagram Reel</h2>
+          <h2 className="font-display text-base font-semibold mb-1">Upload Reel</h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Paste a link like <code className="px-1 py-0.5 rounded bg-muted text-xs">https://www.instagram.com/reel/XXXX/</code>
+            Select a video file (MP4, MOV, WebM) up to 100MB.
           </p>
-          <div className="flex gap-2">
+          <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-background/50 px-4 py-8 cursor-pointer hover:border-primary transition-colors">
+            <Upload size={28} className="text-muted-foreground" />
+            <span className="text-sm font-medium">
+              {uploading ? `Uploading… ${progress}%` : 'Click to choose video'}
+            </span>
             <input
-              type="url"
-              value={newUrl}
-              onChange={e => setNewUrl(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') addReel(); }}
-              placeholder="https://www.instagram.com/reel/..."
-              className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              spellCheck={false}
+              ref={fileRef}
+              type="file"
+              accept="video/*"
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFile(f);
+              }}
             />
-            <button
-              onClick={addReel}
-              disabled={loading || !newUrl.trim()}
-              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-opacity"
-            >
-              <Plus size={16} /> Add
-            </button>
-          </div>
+          </label>
         </div>
 
         <div className="mt-6">
@@ -143,29 +165,34 @@ const ReelManagerPortal = ({ onLogout, onBackToChoice }: Props) => {
           </h2>
           {reels.length === 0 ? (
             <p className="text-sm text-muted-foreground py-8 text-center border border-dashed border-border rounded-xl">
-              No reels yet. Add your first one above.
+              No reels yet. Upload your first one above.
             </p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {reels.map(r => (
                 <li
                   key={r.id}
-                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-3"
+                  className="relative rounded-xl border border-border bg-card overflow-hidden group"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-500/10 text-pink-500 text-xs font-semibold">
+                  <span className="absolute top-2 left-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-pink-500/90 text-white text-xs font-semibold">
                     #{r.position}
                   </span>
-                  <a
-                    href={r.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 truncate text-sm text-primary hover:underline"
-                  >
-                    {r.url}
-                  </a>
+                  {previews[r.id] ? (
+                    <video
+                      src={previews[r.id]}
+                      className="w-full aspect-[9/16] object-cover bg-black"
+                      controls
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : (
+                    <div className="w-full aspect-[9/16] flex items-center justify-center bg-muted text-xs text-muted-foreground">
+                      Loading…
+                    </div>
+                  )}
                   <button
-                    onClick={() => deleteReel(r.id)}
-                    className="rounded-lg p-2 text-destructive hover:bg-destructive/10 transition-colors"
+                    onClick={() => deleteReel(r)}
+                    className="absolute top-2 right-2 rounded-lg p-2 bg-black/60 text-destructive opacity-0 group-hover:opacity-100 hover:bg-black/80 transition-opacity"
                     aria-label="Delete reel"
                   >
                     <Trash2 size={16} />
