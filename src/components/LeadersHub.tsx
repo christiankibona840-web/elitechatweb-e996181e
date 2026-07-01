@@ -191,9 +191,9 @@ const LeadersHub = ({ me }: LeadersHubProps) => {
               </div>
               {p.caption && <p className="text-xs text-muted-foreground mb-2 leading-relaxed">{p.caption}</p>}
               {p.media_type === 'image' ? (
-                <img src={p.media_url} alt={p.leader_name} className="rounded-lg w-full object-cover max-h-72" />
+                <SignedImg src={p.media_url} alt={p.leader_name} className="rounded-lg w-full object-cover max-h-72" />
               ) : (
-                <video src={p.media_url} controls className="rounded-lg w-full max-h-72" />
+                <SignedVideo src={p.media_url} controls className="rounded-lg w-full max-h-72" />
               )}
             </div>
           </div>
