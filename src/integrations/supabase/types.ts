@@ -436,6 +436,47 @@ export type Database = {
           },
         ]
       }
+      leader_posts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          file_name: string | null
+          id: string
+          leader_name: string
+          media_type: string
+          media_url: string
+          uploader_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          file_name?: string | null
+          id?: string
+          leader_name: string
+          media_type: string
+          media_url: string
+          uploader_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          file_name?: string | null
+          id?: string
+          leader_name?: string
+          media_type?: string
+          media_url?: string
+          uploader_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leader_posts_uploader_id_fkey"
+            columns: ["uploader_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       message_reactions: {
         Row: {
           created_at: string | null
