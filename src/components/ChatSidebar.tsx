@@ -9,9 +9,11 @@ import StoryTray from './StoryTray';
 import SettingsPanel from './SettingsPanel';
 import PeoplePanel from './PeoplePanel';
 import ProjectZone from './ProjectZone';
+import LeadersHub from './LeadersHub';
 import GamesPanel from './games/GamesPanel';
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
-import { LogOut, Search, UserPlus, Users, MessageCircle, Camera, Settings, Globe, Rocket, Gamepad2, Code } from 'lucide-react';
+import { LogOut, Search, UserPlus, Users, MessageCircle, Camera, Settings, Globe, Rocket, Gamepad2, Code, Crown } from 'lucide-react';
+
 import type { Tables } from '@/integrations/supabase/types';
 
 type Profile = Tables<'profiles'>;
@@ -44,7 +46,7 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
-  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'games'>('chats');
+  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games'>('chats');
 
   useEffect(() => {
     loadConversations();
@@ -199,8 +201,11 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
         <PeoplePanel me={me} onStartChat={(userId) => { setTab('chats'); onSelectChat({ type: 'dm', id: userId }); }} />
       ) : tab === 'projects' ? (
         <ProjectZone me={me} />
+      ) : tab === 'leaders' ? (
+        <LeadersHub me={me} />
       ) : tab === 'games' ? (
         <GamesPanel me={me} onOpenGame={(id, type) => onOpenGame?.(id, type)} />
+
       ) : (
         <>
           {/* Stories tray (IG-style) */}
@@ -279,8 +284,17 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
               <Rocket size={18} />
               <span className="text-[9px] font-semibold uppercase tracking-wider">Projects</span>
             </button>
+            <button
+              onClick={() => setTab('leaders')}
+              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors text-muted-foreground hover:bg-muted/30 hover:text-foreground"
+              title="Leaders Hub"
+            >
+              <Crown size={18} />
+              <span className="text-[9px] font-semibold uppercase tracking-wider">Leaders</span>
+            </button>
             <a
               href="https://chris-p7a0.onrender.com"
+
               target="_blank"
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors text-muted-foreground hover:bg-muted/30 hover:text-foreground"
