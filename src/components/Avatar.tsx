@@ -18,6 +18,7 @@ interface AvatarProps {
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ name, size = 40, online, presence, isOnline, lastSeen, avatarUrl }, ref) => {
+    const signedAvatar = useSignedUrl(avatarUrl);
     const fontSize = Math.round(size * 0.38);
 
     // Determine which dot to show
