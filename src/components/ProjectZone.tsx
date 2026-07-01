@@ -235,4 +235,16 @@ const ProjectZone = ({ me }: ProjectZoneProps) => {
   );
 };
 
+function SignedAudio({ src }: { src: string }) {
+  const url = useSignedUrl(src);
+  if (!url) return null;
+  return <audio src={url} controls className="w-full mb-2" />;
+}
+
+function SignedDownloadLink({ src, fileName }: { src: string; fileName?: string | null }) {
+  const url = useSignedUrl(src);
+  if (!url) return null;
+  return <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline mb-2 block">📎 {fileName || 'Download file'}</a>;
+}
+
 export default ProjectZone;
