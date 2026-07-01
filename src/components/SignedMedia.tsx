@@ -1,0 +1,15 @@
+import { useSignedUrl } from '@/lib/signedUrl';
+
+type ImgProps = React.ImgHTMLAttributes<HTMLImageElement> & { src: string | null | undefined };
+export function SignedImg({ src, ...rest }: ImgProps) {
+  const url = useSignedUrl(src);
+  if (!url) return <div className={rest.className} style={{ ...(rest.style || {}), background: 'hsl(var(--muted))' }} />;
+  return <img {...rest} src={url} />;
+}
+
+type VideoProps = React.VideoHTMLAttributes<HTMLVideoElement> & { src: string | null | undefined };
+export function SignedVideo({ src, ...rest }: VideoProps) {
+  const url = useSignedUrl(src);
+  if (!url) return null;
+  return <video {...rest} src={url} />;
+}
