@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import Avatar from './Avatar';
+import { SignedImg } from './SignedMedia';
 import { Plus, X, Eye, Image as ImageIcon, Trash2, Heart, MessageCircle, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
@@ -292,7 +293,7 @@ const StatusPanel = ({ me }: StatusPanelProps) => {
             ))}
           </div>
           <div className="max-w-lg w-full px-4 text-center" onClick={() => { if (viewIdx < viewing.statuses.length - 1) setViewIdx(viewIdx + 1); else setViewing(null); }}>
-            {currentStatus.media_url && <img src={currentStatus.media_url} className="max-h-[60vh] mx-auto rounded-xl mb-4" />}
+            {currentStatus.media_url && <SignedImg src={currentStatus.media_url} className="max-h-[60vh] mx-auto rounded-xl mb-4" />}
             {currentStatus.content && <p className="text-xl text-foreground">{currentStatus.content}</p>}
           </div>
 

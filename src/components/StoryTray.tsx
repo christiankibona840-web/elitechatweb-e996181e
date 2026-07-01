@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import Avatar from './Avatar';
+import { SignedImg, SignedVideo } from './SignedMedia';
 import { Plus, X, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
@@ -250,9 +251,9 @@ const StoryTray = ({ me }: StoryTrayProps) => {
           <div className="max-w-md w-full px-4 text-center pointer-events-none">
             {viewing.statuses[viewIdx]?.media_url && (
               viewing.statuses[viewIdx]?.media_type?.startsWith('video/') ? (
-                <video src={viewing.statuses[viewIdx].media_url} className="max-h-[70vh] mx-auto rounded-xl mb-4" autoPlay controls={false} muted playsInline />
+                <SignedVideo src={viewing.statuses[viewIdx].media_url} className="max-h-[70vh] mx-auto rounded-xl mb-4" autoPlay controls={false} muted playsInline />
               ) : (
-                <img src={viewing.statuses[viewIdx].media_url} alt="" className="max-h-[70vh] mx-auto rounded-xl mb-4" />
+                <SignedImg src={viewing.statuses[viewIdx].media_url} alt="" className="max-h-[70vh] mx-auto rounded-xl mb-4" />
               )
             )}
             {viewing.statuses[viewIdx]?.content && <p className="text-xl text-white">{viewing.statuses[viewIdx].content}</p>}

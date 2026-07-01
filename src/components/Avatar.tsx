@@ -1,5 +1,6 @@
 import React from 'react';
 import { avatarColor, getPresence, type Presence } from '@/lib/chatStore';
+import { useSignedUrl } from '@/lib/signedUrl';
 
 interface AvatarProps {
   name: string;
@@ -17,6 +18,7 @@ interface AvatarProps {
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ name, size = 40, online, presence, isOnline, lastSeen, avatarUrl }, ref) => {
+    const signedAvatar = useSignedUrl(avatarUrl);
     const fontSize = Math.round(size * 0.38);
 
     // Determine which dot to show
@@ -42,12 +44,19 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     return (
       <div ref={ref} className="relative flex-shrink-0">
         {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={name}
-            className="rounded-full object-cover"
-            style={{ width: size, height: size }}
-          />
+          signedAvatar ? (
+            <img
+              src={signedAvatar}
+              alt={name}
+              className="rounded-full object-cover"
+              style={{ width: size, height: size }}
+            />
+          ) : (
+            <div
+              className="rounded-full bg-muted animate-pulse"
+              style={{ width: size, height: size }}
+            />
+          )
         ) : (
           <div
             className="rounded-full flex items-center justify-center font-bold text-foreground select-none"

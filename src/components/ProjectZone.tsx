@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import Avatar from './Avatar';
+import { SignedImg, SignedVideo } from './SignedMedia';
+import { useSignedUrl } from '@/lib/signedUrl';
 import { Plus, Send, Trash2, Image, FileAudio, FileVideo, FileText, X, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
@@ -188,11 +190,11 @@ const ProjectZone = ({ me }: ProjectZoneProps) => {
               </div>
               <h4 className="text-sm font-semibold text-foreground mb-1">{p.title}</h4>
               {p.description && <p className="text-xs text-muted-foreground mb-2 leading-relaxed">{p.description}</p>}
-              {p.media_url && p.media_type === 'image' && <img src={p.media_url} alt={p.title} className="rounded-lg max-h-48 object-cover w-full mb-2" />}
-              {p.media_url && p.media_type === 'video' && <video src={p.media_url} controls className="rounded-lg max-h-48 w-full mb-2" />}
-              {p.media_url && p.media_type === 'audio' && <audio src={p.media_url} controls className="w-full mb-2" />}
+              {p.media_url && p.media_type === 'image' && <SignedImg src={p.media_url} alt={p.title} className="rounded-lg max-h-48 object-cover w-full mb-2" />}
+              {p.media_url && p.media_type === 'video' && <SignedVideo src={p.media_url} controls className="rounded-lg max-h-48 w-full mb-2" />}
+              {p.media_url && p.media_type === 'audio' && <SignedAudio src={p.media_url} />}
               {p.media_url && p.media_type !== 'image' && p.media_type !== 'video' && p.media_type !== 'audio' && (
-                <a href={p.media_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline mb-2 block">📎 {p.file_name || 'Download file'}</a>
+                <SignedDownloadLink src={p.media_url} fileName={p.file_name} />
               )}
               <button onClick={() => toggleComments(p.id)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mt-1">
                 <MessageSquare size={13} />
@@ -232,5 +234,17 @@ const ProjectZone = ({ me }: ProjectZoneProps) => {
     </div>
   );
 };
+
+function SignedAudio({ src }: { src: string }) {
+  const url = useSignedUrl(src);
+  if (!url) return null;
+  return <audio src={url} controls className="w-full mb-2" />;
+}
+
+function SignedDownloadLink({ src, fileName }: { src: string; fileName?: string | null }) {
+  const url = useSignedUrl(src);
+  if (!url) return null;
+  return <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline mb-2 block">📎 {fileName || 'Download file'}</a>;
+}
 
 export default ProjectZone;
