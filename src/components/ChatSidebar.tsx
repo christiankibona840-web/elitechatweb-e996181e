@@ -9,9 +9,11 @@ import StoryTray from './StoryTray';
 import SettingsPanel from './SettingsPanel';
 import PeoplePanel from './PeoplePanel';
 import ProjectZone from './ProjectZone';
+import LeadersHub from './LeadersHub';
 import GamesPanel from './games/GamesPanel';
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
-import { LogOut, Search, UserPlus, Users, MessageCircle, Camera, Settings, Globe, Rocket, Gamepad2, Code } from 'lucide-react';
+import { LogOut, Search, UserPlus, Users, MessageCircle, Camera, Settings, Globe, Rocket, Gamepad2, Code, Crown } from 'lucide-react';
+
 import type { Tables } from '@/integrations/supabase/types';
 
 type Profile = Tables<'profiles'>;
@@ -44,7 +46,7 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
-  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'games'>('chats');
+  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games'>('chats');
 
   useEffect(() => {
     loadConversations();
