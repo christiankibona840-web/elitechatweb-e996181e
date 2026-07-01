@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import Avatar from './Avatar';
+import { SignedImg, SignedVideo } from './SignedMedia';
 import { Plus, X, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
