@@ -1,5 +1,6 @@
 import React from 'react';
 import { avatarColor, getPresence, type Presence } from '@/lib/chatStore';
+import { useSignedUrl } from '@/lib/signedUrl';
 
 interface AvatarProps {
   name: string;
