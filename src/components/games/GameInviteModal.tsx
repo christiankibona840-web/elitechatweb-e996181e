@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { isActiveNow } from '@/lib/chatStore';
 import Avatar from '@/components/Avatar';
 import { X, Search, Gamepad2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -146,7 +147,7 @@ const GameInviteModal = ({ me, preselectedContactId, gameType: initialType, onCl
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-foreground truncate">{c.display_name}</div>
                   <div className="text-xs text-muted-foreground truncate">
-                    {c.is_online ? <span className="text-app-online">● Online</span> : '@' + c.username}
+                    {isActiveNow(c.is_online, c.last_seen) ? <span className="text-app-online">● Online</span> : '@' + c.username}
                   </div>
                 </div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-primary">

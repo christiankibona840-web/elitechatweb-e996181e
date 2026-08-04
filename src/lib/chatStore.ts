@@ -30,3 +30,20 @@ export function fmtDate(dateStr: string): string {
   if (diff === 1) return 'Yesterday';
   return d.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
 }
+
+/** True only when the user has a fresh heartbeat (really in the app right now). */
+export function isActiveNow(isOnline?: boolean | null, lastSeen?: string | null): boolean {
+  return getPresence(isOnline, lastSeen) === 'active';
+}
+
+/** Human readable "last seen" text derived from the real heartbeat timestamp. */
+export function fmtLastSeen(lastSeen?: string | null, isOnline?: boolean | null): string {
+  if (isActiveNow(isOnline, lastSeen)) return 'online';
+  if (!lastSeen) return 'offline';
+  const diff = Math.floor((Date.now() - new Date(lastSeen).getTime()) / 60000);
+  if (diff < 1) return 'last seen just now';
+  if (diff < 60) return `last seen ${diff}m ago`;
+  if (diff < 1440) return `last seen ${Math.floor(diff / 60)}h ago`;
+  if (diff < 43200) return `last seen ${Math.floor(diff / 1440)}d ago`;
+  return `last seen ${new Date(lastSeen).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' })}`;
+}

@@ -4,6 +4,7 @@ import Avatar from './Avatar';
 import { UserPlus, Search, Check, Sparkles, X, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
+import { isActiveNow } from '@/lib/chatStore';
 
 type Profile = Tables<'profiles'>;
 
@@ -121,7 +122,7 @@ const PeoplePanel = ({ me, onStartChat }: PeoplePanelProps) => {
 
                     {/* Avatar with presence ring + dot (green=truly active, yellow=idle) */}
                     <div className="relative mb-2">
-                      <div className={`rounded-full p-[2px] ${user.is_online ? 'bg-gradient-to-tr from-primary to-accent' : ''}`}>
+                      <div className={`rounded-full p-[2px] ${isActiveNow(user.is_online, user.last_seen) ? 'bg-gradient-to-tr from-primary to-accent' : ''}`}>
                         <div className="rounded-full bg-card p-[1px]">
                           <Avatar name={user.display_name} size={52} avatarUrl={user.avatar_url} isOnline={user.is_online} lastSeen={user.last_seen} />
                         </div>
