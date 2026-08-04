@@ -42,7 +42,7 @@ interface ConversationItem {
   avatarUrl?: string | null;
 }
 
-const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onProfileUpdate, onOpenGame }: ChatSidebarProps) => {
+const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onProfileUpdate, onOpenGame, onOpenReels }: ChatSidebarProps) => {
   const [search, setSearch] = useState('');
   const [copied, setCopied] = useState(false);
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
