@@ -4,7 +4,6 @@ import Avatar from './Avatar';
 import { Search, X, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
-import { isActiveNow } from '@/lib/chatStore';
 
 type Profile = Tables<'profiles'>;
 
