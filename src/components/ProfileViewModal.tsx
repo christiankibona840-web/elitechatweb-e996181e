@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import Avatar from './Avatar';
 import type { Tables } from '@/integrations/supabase/types';
+import { isActiveNow } from '@/lib/chatStore';
 
 type Profile = Tables<'profiles'>;
 
@@ -10,6 +11,7 @@ interface ProfileViewModalProps {
 }
 
 const ProfileViewModal = ({ profile, onClose }: ProfileViewModalProps) => {
+  const active = isActiveNow(profile.is_online, profile.last_seen);
   const formatLastSeen = (d: string | null) => {
     if (!d) return 'Unknown';
     const date = new Date(d);
