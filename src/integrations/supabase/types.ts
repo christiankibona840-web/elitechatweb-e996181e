@@ -572,6 +572,39 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          link: string | null
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          link?: string | null
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -706,27 +739,97 @@ export type Database = {
           },
         ]
       }
+      reel_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          reel_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          reel_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          reel_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reel_comments_reel_id_fkey"
+            columns: ["reel_id"]
+            isOneToOne: false
+            referencedRelation: "reels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reel_likes: {
+        Row: {
+          created_at: string
+          id: string
+          reel_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reel_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reel_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reel_likes_reel_id_fkey"
+            columns: ["reel_id"]
+            isOneToOne: false
+            referencedRelation: "reels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reels: {
         Row: {
           added_by: string
+          caption: string | null
           created_at: string
           id: string
           position: number
+          thumbnail_url: string | null
           url: string
+          views: number
         }
         Insert: {
           added_by: string
+          caption?: string | null
           created_at?: string
           id?: string
           position?: number
+          thumbnail_url?: string | null
           url: string
+          views?: number
         }
         Update: {
           added_by?: string
+          caption?: string | null
           created_at?: string
           id?: string
           position?: number
+          thumbnail_url?: string | null
           url?: string
+          views?: number
         }
         Relationships: []
       }
@@ -1031,11 +1134,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_reel_view: { Args: { _reel_id: string }; Returns: undefined }
       is_default_group: { Args: { _group_id: string }; Returns: boolean }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
       }
+      purge_expired_content: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user" | "reel_manager"
