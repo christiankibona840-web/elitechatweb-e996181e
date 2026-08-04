@@ -34,7 +34,7 @@ const ProfileViewModal = ({ profile, onClose }: ProfileViewModalProps) => {
         <div className="px-5 pb-5 -mt-10">
           <div className="relative inline-block">
             <Avatar name={profile.display_name} size={80} avatarUrl={profile.avatar_url} />
-            {profile.is_online && (
+            {active && (
               <div className="absolute bottom-1 right-1 w-4 h-4 bg-app-online rounded-full border-3 border-card" />
             )}
           </div>
@@ -52,15 +52,16 @@ const ProfileViewModal = ({ profile, onClose }: ProfileViewModalProps) => {
           <div className="mt-3 grid grid-cols-2 gap-2">
             <div className="p-3 bg-muted/30 rounded-xl">
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Status</p>
-              <p className={`text-sm font-medium ${profile.is_online ? 'text-app-online' : 'text-muted-foreground'}`}>
-                {profile.is_online ? '🟢 Online' : '⚫ Offline'}
+              <p className={`text-sm font-medium ${active ? 'text-app-online' : 'text-muted-foreground'}`}>
+                {active ? '🟢 Online' : '⚫ Offline'}
               </p>
             </div>
             <div className="p-3 bg-muted/30 rounded-xl">
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Last Seen</p>
-              <p className="text-sm text-foreground">{profile.is_online ? 'Now' : formatLastSeen(profile.last_seen)}</p>
+              <p className="text-sm text-foreground">{active ? 'Now' : formatLastSeen(profile.last_seen)}</p>
             </div>
           </div>
+
 
           {profile.gender && (
             <div className="mt-2 p-3 bg-muted/30 rounded-xl">
