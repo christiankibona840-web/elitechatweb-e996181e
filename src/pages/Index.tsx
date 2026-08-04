@@ -8,6 +8,7 @@ import AdminPortal from '@/components/AdminPortal';
 import ReelManagerPortal from '@/components/ReelManagerPortal';
 import AnnouncementBanner from '@/components/AnnouncementBanner';
 import ReelsPanel from '@/components/ReelsPanel';
+import ReelsFeed from '@/components/reels/ReelsFeed';
 import TicTacToeBoard from '@/components/games/TicTacToeBoard';
 import Connect4Board from '@/components/games/Connect4Board';
 import IncomingGameInvite from '@/components/games/IncomingGameInvite';
