@@ -54,6 +54,7 @@ const Index = () => {
 
   useEffect(() => {
     loadSavedTheme();
+    supabase.rpc('purge_expired_content').then(() => {});
     const seenVersion = localStorage.getItem('app-version-seen');
     if (seenVersion && seenVersion !== APP_VERSION) {
       setShowUpdateAlert(true);
