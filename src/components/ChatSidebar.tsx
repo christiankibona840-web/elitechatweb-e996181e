@@ -27,6 +27,7 @@ interface ChatSidebarProps {
   refreshKey: number;
   onProfileUpdate: (profile: Profile) => void;
   onOpenGame?: (gameId: string, gameType?: 'ttt' | 'c4') => void;
+  onOpenReels?: () => void;
 }
 
 interface ConversationItem {
