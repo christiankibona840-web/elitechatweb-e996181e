@@ -172,6 +172,7 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
           </div>
         </div>
         <div className="flex gap-0.5">
+          <NotificationBell meId={me.id} />
           <button onClick={() => setShowCreateGroup(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-app-icon hover:bg-muted/30 transition-colors" title="Create group">
             <Users size={20} />
           </button>
@@ -187,6 +188,7 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
       {/* Tabs */}
       <div className="flex border-b border-border flex-shrink-0 overflow-x-auto no-scrollbar">
         <TabButton active={tab === 'chats'} onClick={() => setTab('chats')} icon={<MessageCircle size={13} />} label="Chats" />
+        <TabButton active={false} onClick={() => onOpenReels?.()} icon={<Film size={13} />} label="Reels" />
         <TabButton active={tab === 'people'} onClick={() => setTab('people')} icon={<Globe size={13} />} label="People" />
         <TabButton active={tab === 'games'} onClick={() => setTab('games')} icon={<Gamepad2 size={13} />} label="Games" />
         <TabButton active={tab === 'status'} onClick={() => setTab('status')} icon={<Camera size={13} />} label="Status" />
