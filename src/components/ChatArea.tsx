@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { fmtTime, fmtDate } from '@/lib/chatStore';
+import { fmtTime, fmtDate, isActiveNow, fmtLastSeen } from '@/lib/chatStore';
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
 import Avatar from './Avatar';
 import VoiceRecorder from './VoiceRecorder';
@@ -589,7 +589,7 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
   const subtitle = isBot
     ? (botLoading ? 'typing...' : 'AI Assistant • Always online')
     : activeChat.type === 'dm'
-      ? (contactProfile?.is_online ? 'online' : 'offline')
+      ? fmtLastSeen(contactProfile?.last_seen, contactProfile?.is_online)
       : 'Group';
 
   let lastDate = '';
@@ -674,7 +674,7 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
           </div>
           <div>
             <div className="text-sm font-medium text-foreground">{chatName}</div>
-            <div className={`text-xs ${isBot || contactProfile?.is_online ? 'text-app-online' : 'text-muted-foreground'}`}>
+            <div className={`text-xs ${isBot || isActiveNow(contactProfile?.is_online, contactProfile?.last_seen) ? 'text-app-online' : 'text-muted-foreground'}`}>
               {!isBot && isTyping ? 'typing...' : subtitle}
               {disappearSetting > 0 && <span className="ml-1.5">⏱</span>}
             </div>
