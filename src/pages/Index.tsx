@@ -422,7 +422,6 @@ const Index = () => {
         {showReels && profile && (
           <ReelsFeed meId={profile.id} canManage={isAdmin || isReelManager} onClose={() => setShowReels(false)} />
         )}
-        )}
         {activeGameId ? (
           <div className="flex-1 min-w-0">
             {activeGameType === 'c4' ? (
