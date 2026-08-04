@@ -152,6 +152,22 @@
 @utility bg-gradient-gold {
   background-image: var(--gradient-gold);
 }
+@utility bg-gradient-blush {
+  background-image: var(--gradient-blush);
+}
+@utility glass-card {
+  background-color: hsl(var(--card) / 0.72);
+  border: 1px solid hsl(var(--border) / 0.8);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+@utility hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-gold);
+  }
+}
+}
 
 @layer base {
   * {
