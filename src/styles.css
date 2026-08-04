@@ -180,10 +180,12 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Figtree', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.005em;
   }
   h1, h2, h3, .font-display {
-    font-family: 'Playfair Display', Georgia, serif;
+    font-family: 'Outfit', 'Figtree', system-ui, sans-serif;
+    letter-spacing: -0.02em;
   }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
