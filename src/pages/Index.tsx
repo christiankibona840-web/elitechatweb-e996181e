@@ -416,7 +416,12 @@ const Index = () => {
             refreshKey={refreshKey}
             onProfileUpdate={handleProfileUpdate}
             onOpenGame={openGame}
+            onOpenReels={() => setShowReels(true)}
           />
+        )}
+        {showReels && profile && (
+          <ReelsFeed meId={profile.id} canManage={isAdmin || isReelManager} onClose={() => setShowReels(false)} />
+        )}
         )}
         {activeGameId ? (
           <div className="flex-1 min-w-0">
