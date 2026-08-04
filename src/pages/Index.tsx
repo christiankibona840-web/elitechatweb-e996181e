@@ -34,6 +34,7 @@ const Index = () => {
   const [pendingTargetId, setPendingTargetId] = useState<string | null>(null);
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
   const [activeGameType, setActiveGameType] = useState<'ttt' | 'c4'>('ttt');
+  const [showReels, setShowReels] = useState(false);
   const isMobile = useIsMobile();
 
   const openGame = useCallback((gameId: string, gameType: 'ttt' | 'c4' = 'ttt') => {
