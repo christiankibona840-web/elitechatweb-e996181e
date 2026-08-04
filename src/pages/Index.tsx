@@ -8,6 +8,7 @@ import AdminPortal from '@/components/AdminPortal';
 import ReelManagerPortal from '@/components/ReelManagerPortal';
 import AnnouncementBanner from '@/components/AnnouncementBanner';
 import ReelsPanel from '@/components/ReelsPanel';
+import ReelsFeed from '@/components/reels/ReelsFeed';
 import TicTacToeBoard from '@/components/games/TicTacToeBoard';
 import Connect4Board from '@/components/games/Connect4Board';
 import IncomingGameInvite from '@/components/games/IncomingGameInvite';
@@ -33,6 +34,7 @@ const Index = () => {
   const [pendingTargetId, setPendingTargetId] = useState<string | null>(null);
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
   const [activeGameType, setActiveGameType] = useState<'ttt' | 'c4'>('ttt');
+  const [showReels, setShowReels] = useState(false);
   const isMobile = useIsMobile();
 
   const openGame = useCallback((gameId: string, gameType: 'ttt' | 'c4' = 'ttt') => {
@@ -52,6 +54,7 @@ const Index = () => {
 
   useEffect(() => {
     loadSavedTheme();
+    supabase.rpc('purge_expired_content').then(() => {});
     const seenVersion = localStorage.getItem('app-version-seen');
     if (seenVersion && seenVersion !== APP_VERSION) {
       setShowUpdateAlert(true);
@@ -416,7 +419,11 @@ const Index = () => {
             refreshKey={refreshKey}
             onProfileUpdate={handleProfileUpdate}
             onOpenGame={openGame}
+            onOpenReels={() => setShowReels(true)}
           />
+        )}
+        {showReels && profile && (
+          <ReelsFeed meId={profile.id} canManage={isAdmin || isReelManager} onClose={() => setShowReels(false)} />
         )}
         {activeGameId ? (
           <div className="flex-1 min-w-0">
