@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { fmtTime } from '@/lib/chatStore';
+import { usePresenceTick } from '@/hooks/usePresenceTick';
+
 import Avatar from './Avatar';
 import UserSearchModal from './UserSearchModal';
 import CreateGroupModal from './CreateGroupModal';
