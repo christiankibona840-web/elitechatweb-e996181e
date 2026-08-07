@@ -1,0 +1,1 @@
+UPDATE public.profiles SET is_online = false WHERE is_online = true AND (last_seen IS NULL OR last_seen < now() - interval '3 minutes');
