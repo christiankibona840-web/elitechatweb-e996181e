@@ -14,6 +14,9 @@ import GameInviteModal from './games/GameInviteModal';
 import { Send, Paperclip, X, FileText, Image as ImageIcon, Mic, ArrowLeft, Search, Star, ImagePlay, Timer, ChevronDown, Gamepad2, Trash2, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
+import { MEDIA_BUCKETS } from '@/lib/signedUrl';
+import { SignedImg, SignedVideo, SignedAudio, SignedLink } from './SignedMedia';
+
 
 type Profile = Tables<'profiles'>;
 
@@ -317,13 +320,19 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
   };
 
   const uploadFile = async (f: File): Promise<{ url: string; name: string; type: string } | null> => {
-    const ext = f.name.split('.').pop();
+    const ext = f.name.split('.').pop() || 'bin';
+    const bucket = f.type.startsWith('image/')
+      ? 'chat-images'
+      : f.type.startsWith('video/')
+        ? 'chat-videos'
+        : 'chat-files';
     const path = `${me.id}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('chat-files').upload(path, f);
+    const { error } = await supabase.storage.from(bucket).upload(path, f, { contentType: f.type });
     if (error) { toast.error('File upload error'); return null; }
-    const { data: { publicUrl } } = supabase.storage.from('chat-files').getPublicUrl(path);
-    return { url: publicUrl, name: f.name, type: f.type };
+    // Store a bucket-prefixed path; signed URLs are generated on render.
+    return { url: `${bucket}/${path}`, name: f.name, type: f.type };
   };
+
 
   const sendMessage = async (voiceBlob?: Blob) => {
     const text = input.trim();
@@ -426,13 +435,19 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
     onMessagesChanged();
   };
 
-  // Parse Supabase storage public URL → { bucket, path }
+  // Parse a stored media reference (bucket-prefixed path or storage URL) → { bucket, path }
   const parseStorageUrl = (url: string | null | undefined): { bucket: string; path: string } | null => {
     if (!url) return null;
+    if (!/^https?:\/\//i.test(url)) {
+      const clean = url.replace(/^\/+/, '');
+      const bucket = MEDIA_BUCKETS.find((b) => clean.startsWith(`${b}/`));
+      return bucket ? { bucket, path: clean.slice(bucket.length + 1) } : { bucket: 'chat-files', path: clean };
+    }
     const m = url.match(/\/storage\/v1\/object\/(?:public|sign)\/([^/]+)\/(.+?)(?:\?|$)/);
     if (!m) return null;
     return { bucket: m[1], path: decodeURIComponent(m[2]) };
   };
+
 
   // Hard delete: remove rows from DB and free storage space
   const hardDeleteMessages = async (msgs: any[]) => {
@@ -597,25 +612,34 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
   const renderFilePreview = (msg: any) => {
     if (!msg.file_url) return null;
     const isImage = msg.file_type?.startsWith('image/');
+    const isVideo = msg.file_type?.startsWith('video/');
     const isAudio = msg.file_type?.startsWith('audio/');
     if (isImage) {
       return (
-        <a href={msg.file_url} target="_blank" rel="noopener noreferrer" className="block mb-1">
-          <img src={msg.file_url} alt={msg.file_name} className="max-w-[200px] rounded-lg" />
-        </a>
+        <SignedLink src={msg.file_url} className="block mb-1">
+          <SignedImg src={msg.file_url} alt={msg.file_name} className="max-w-[200px] rounded-lg" />
+        </SignedLink>
+      );
+    }
+    if (isVideo) {
+      return (
+        <div className="mb-1">
+          <SignedVideo src={msg.file_url} controls playsInline preload="metadata" className="max-w-[240px] rounded-lg" />
+        </div>
       );
     }
     if (isAudio) {
-      return <div className="mb-1"><audio controls src={msg.file_url} className="max-w-[220px]" /></div>;
+      return <div className="mb-1"><SignedAudio controls src={msg.file_url} className="max-w-[220px]" /></div>;
     }
     return (
-      <a href={msg.file_url} target="_blank" rel="noopener noreferrer"
+      <SignedLink src={msg.file_url}
         className="flex items-center gap-2 bg-black/20 rounded-lg p-2 mb-1 hover:bg-black/30 transition-colors">
         <FileText size={20} />
         <span className="text-xs truncate">{msg.file_name || 'File'}</span>
-      </a>
+      </SignedLink>
     );
   };
+
 
   const renderReactions = (msgId: string) => {
     const msgReactions = reactions[msgId];
