@@ -88,42 +88,45 @@ const Index = () => {
   useEffect(() => {
     if (!profile?.id) return;
     const userId = profile.id;
+    let lastBeat = 0;
 
-    const beat = (online: boolean) => {
+    const beat = (online: boolean, force = false) => {
+      const now = Date.now();
+      if (!force && online && now - lastBeat < 20000) return;
+      lastBeat = now;
       supabase.from('profiles')
         .update({ is_online: online, last_seen: new Date().toISOString() })
-        .eq('id', userId);
+        .eq('id', userId)
+        .then(() => {});
     };
 
     // Initial heartbeat
-    beat(true);
-    // Every 45s while tab is visible
+    beat(true, true);
+    // Every 30s while tab is visible — keeps `last_seen` inside the 2 min freshness window
     const interval = setInterval(() => {
-      if (!document.hidden) beat(true);
-    }, 45000);
+      if (!document.hidden) beat(true, true);
+    }, 30000);
 
-    const onVisibility = () => beat(!document.hidden);
-    const onUnload = () => {
-      // Best-effort mark offline on close
-      try {
-        navigator.sendBeacon?.(
-          `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`,
-          new Blob([JSON.stringify({ is_online: false, last_seen: new Date().toISOString() })], { type: 'application/json' })
-        );
-      } catch {}
-    };
+    // Real user activity refreshes the heartbeat immediately (throttled to 20s)
+    const onActivity = () => { if (!document.hidden) beat(true); };
+    const onVisibility = () => beat(!document.hidden, true);
 
     document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('beforeunload', onUnload);
-    window.addEventListener('pagehide', onUnload);
+    window.addEventListener('focus', onActivity);
+    window.addEventListener('pointerdown', onActivity);
+    window.addEventListener('keydown', onActivity);
 
     return () => {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('beforeunload', onUnload);
-      window.removeEventListener('pagehide', onUnload);
+      window.removeEventListener('focus', onActivity);
+      window.removeEventListener('pointerdown', onActivity);
+      window.removeEventListener('keydown', onActivity);
+      // Leaving the app (logout / unmount): stamp the real last-seen time
+      beat(false, true);
     };
   }, [profile?.id]);
+
 
   useEffect(() => {
     if (!profile || !pendingTargetId) return;
