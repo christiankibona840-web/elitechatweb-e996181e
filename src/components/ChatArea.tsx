@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { fmtTime, fmtDate, isActiveNow, fmtLastSeen } from '@/lib/chatStore';
+import { usePresenceTick } from '@/hooks/usePresenceTick';
+
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
 import Avatar from './Avatar';
 import VoiceRecorder from './VoiceRecorder';
