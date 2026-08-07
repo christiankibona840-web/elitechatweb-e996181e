@@ -56,6 +56,24 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
     loadConversations();
   }, [me.id, refreshKey]);
 
+  // Live presence: apply profile heartbeats as they land + re-render on a timer
+  usePresenceTick(20000);
+  useEffect(() => {
+    const ch = supabase
+      .channel('sidebar-presence')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
+        const p = payload.new as Profile;
+        setConversations(prev => prev.map(c =>
+          c.type === 'dm' && c.id === p.id
+            ? { ...c, isOnline: p.is_online, lastSeen: p.last_seen, avatarUrl: p.avatar_url, name: p.display_name }
+            : c
+        ));
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+
   const loadConversations = async () => {
     const { data: contacts } = await supabase
       .from('contacts')
