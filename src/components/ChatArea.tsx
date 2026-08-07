@@ -14,6 +14,9 @@ import GameInviteModal from './games/GameInviteModal';
 import { Send, Paperclip, X, FileText, Image as ImageIcon, Mic, ArrowLeft, Search, Star, ImagePlay, Timer, ChevronDown, Gamepad2, Trash2, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
+import { MEDIA_BUCKETS } from '@/lib/signedUrl';
+import { SignedImg, SignedVideo, SignedAudio, SignedLink } from './SignedMedia';
+
 
 type Profile = Tables<'profiles'>;
 
