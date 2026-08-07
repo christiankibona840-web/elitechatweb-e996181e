@@ -317,13 +317,19 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
   };
 
   const uploadFile = async (f: File): Promise<{ url: string; name: string; type: string } | null> => {
-    const ext = f.name.split('.').pop();
+    const ext = f.name.split('.').pop() || 'bin';
+    const bucket = f.type.startsWith('image/')
+      ? 'chat-images'
+      : f.type.startsWith('video/')
+        ? 'chat-videos'
+        : 'chat-files';
     const path = `${me.id}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('chat-files').upload(path, f);
+    const { error } = await supabase.storage.from(bucket).upload(path, f, { contentType: f.type });
     if (error) { toast.error('File upload error'); return null; }
-    const { data: { publicUrl } } = supabase.storage.from('chat-files').getPublicUrl(path);
-    return { url: publicUrl, name: f.name, type: f.type };
+    // Store a bucket-prefixed path; signed URLs are generated on render.
+    return { url: `${bucket}/${path}`, name: f.name, type: f.type };
   };
+
 
   const sendMessage = async (voiceBlob?: Blob) => {
     const text = input.trim();
