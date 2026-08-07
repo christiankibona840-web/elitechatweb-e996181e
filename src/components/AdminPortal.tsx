@@ -491,10 +491,11 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
                   <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                     <span>Joined: {formatDate(selectedUser.created_at)}</span>
                     <span>Last seen: {formatLastSeen(selectedUser.last_seen)}</span>
-                    <span className={`inline-flex items-center gap-1 ${selectedUser.is_online ? 'text-app-online' : ''}`}>
-                      <span className={`w-2 h-2 rounded-full ${selectedUser.is_online ? 'bg-app-online' : 'bg-muted-foreground'}`} />
-                      {selectedUser.is_online ? 'Online' : 'Offline'}
+                    <span className={`inline-flex items-center gap-1 ${getActivity(selectedUser) === 'active' ? 'text-app-online' : ''}`}>
+                      <span className={`w-2 h-2 rounded-full ${getActivity(selectedUser) === 'active' ? 'bg-app-online' : getActivity(selectedUser) === 'idle' ? 'bg-app-idle' : 'bg-muted-foreground'}`} />
+                      {getActivity(selectedUser) === 'active' ? 'Online' : getActivity(selectedUser) === 'idle' ? 'Idle' : 'Offline'}
                     </span>
+
                   </div>
                 </div>
               </div>
