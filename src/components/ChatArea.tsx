@@ -290,8 +290,9 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
   // Keep the header presence live: refresh on DB updates + re-render on a timer
   usePresenceTick(20000);
   useEffect(() => {
-    if (activeChat.type !== 'dm' || activeChat.id === LOVABLE_BOT_ID) return;
+    if (!activeChat || activeChat.type !== 'dm' || activeChat.id === LOVABLE_BOT_ID) return;
     const contactId = activeChat.id;
+
     const ch = supabase
       .channel(`presence-${contactId}`)
       .on('postgres_changes', {
