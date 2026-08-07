@@ -30,7 +30,9 @@ interface AdminPortalProps {
 }
 
 const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
+  usePresenceTick(30000);
   const [users, setUsers] = useState<AdminUser[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
