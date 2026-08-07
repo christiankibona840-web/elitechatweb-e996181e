@@ -432,13 +432,19 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
     onMessagesChanged();
   };
 
-  // Parse Supabase storage public URL → { bucket, path }
+  // Parse a stored media reference (bucket-prefixed path or storage URL) → { bucket, path }
   const parseStorageUrl = (url: string | null | undefined): { bucket: string; path: string } | null => {
     if (!url) return null;
+    if (!/^https?:\/\//i.test(url)) {
+      const clean = url.replace(/^\/+/, '');
+      const bucket = MEDIA_BUCKETS.find((b) => clean.startsWith(`${b}/`));
+      return bucket ? { bucket, path: clean.slice(bucket.length + 1) } : { bucket: 'chat-files', path: clean };
+    }
     const m = url.match(/\/storage\/v1\/object\/(?:public|sign)\/([^/]+)\/(.+?)(?:\?|$)/);
     if (!m) return null;
     return { bucket: m[1], path: decodeURIComponent(m[2]) };
   };
+
 
   // Hard delete: remove rows from DB and free storage space
   const hardDeleteMessages = async (msgs: any[]) => {
