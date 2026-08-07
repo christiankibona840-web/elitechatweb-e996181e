@@ -365,7 +365,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
                 <div className="w-3 h-3 rounded-full bg-muted-foreground" />
               </div>
               <div>
-                <p className="text-2xl font-bold font-display">{users.filter(u => !u.is_online).length}</p>
+                <p className="text-2xl font-bold font-display">{users.filter(u => getActivity(u) !== 'active').length}</p>
                 <p className="text-xs text-muted-foreground">Offline</p>
               </div>
             </div>
