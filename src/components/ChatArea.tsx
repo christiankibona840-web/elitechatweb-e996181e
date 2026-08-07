@@ -609,25 +609,34 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
   const renderFilePreview = (msg: any) => {
     if (!msg.file_url) return null;
     const isImage = msg.file_type?.startsWith('image/');
+    const isVideo = msg.file_type?.startsWith('video/');
     const isAudio = msg.file_type?.startsWith('audio/');
     if (isImage) {
       return (
-        <a href={msg.file_url} target="_blank" rel="noopener noreferrer" className="block mb-1">
-          <img src={msg.file_url} alt={msg.file_name} className="max-w-[200px] rounded-lg" />
-        </a>
+        <SignedLink src={msg.file_url} className="block mb-1">
+          <SignedImg src={msg.file_url} alt={msg.file_name} className="max-w-[200px] rounded-lg" />
+        </SignedLink>
+      );
+    }
+    if (isVideo) {
+      return (
+        <div className="mb-1">
+          <SignedVideo src={msg.file_url} controls playsInline preload="metadata" className="max-w-[240px] rounded-lg" />
+        </div>
       );
     }
     if (isAudio) {
-      return <div className="mb-1"><audio controls src={msg.file_url} className="max-w-[220px]" /></div>;
+      return <div className="mb-1"><SignedAudio controls src={msg.file_url} className="max-w-[220px]" /></div>;
     }
     return (
-      <a href={msg.file_url} target="_blank" rel="noopener noreferrer"
+      <SignedLink src={msg.file_url}
         className="flex items-center gap-2 bg-black/20 rounded-lg p-2 mb-1 hover:bg-black/30 transition-colors">
         <FileText size={20} />
         <span className="text-xs truncate">{msg.file_name || 'File'}</span>
-      </a>
+      </SignedLink>
     );
   };
+
 
   const renderReactions = (msgId: string) => {
     const msgReactions = reactions[msgId];
