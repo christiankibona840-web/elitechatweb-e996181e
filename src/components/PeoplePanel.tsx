@@ -5,6 +5,8 @@ import { UserPlus, Search, Check, Sparkles, X, MessageCircle } from 'lucide-reac
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
 import { isActiveNow } from '@/lib/chatStore';
+import { usePresenceTick } from '@/hooks/usePresenceTick';
+
 
 type Profile = Tables<'profiles'>;
 
