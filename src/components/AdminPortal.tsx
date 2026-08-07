@@ -7,6 +7,8 @@ import ApprovedIdsPanel from './admin/ApprovedIdsPanel';
 import GroupsPanel from './admin/GroupsPanel';
 import UserCommunitiesModal from './admin/UserCommunitiesModal';
 import { adminCreateUser } from '@/lib/admin-users.functions';
+import { usePresenceTick } from '@/hooks/usePresenceTick';
+
 
 interface AdminUser {
   id: string;
@@ -28,7 +30,9 @@ interface AdminPortalProps {
 }
 
 const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
+  usePresenceTick(30000);
   const [users, setUsers] = useState<AdminUser[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -354,7 +358,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
                 <div className="w-3 h-3 rounded-full bg-app-online animate-pulse" />
               </div>
               <div>
-                <p className="text-2xl font-bold font-display">{users.filter(u => u.is_online).length}</p>
+                <p className="text-2xl font-bold font-display">{users.filter(u => getActivity(u) === 'active').length}</p>
                 <p className="text-xs text-muted-foreground">Online Now</p>
               </div>
             </div>
@@ -365,7 +369,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
                 <div className="w-3 h-3 rounded-full bg-muted-foreground" />
               </div>
               <div>
-                <p className="text-2xl font-bold font-display">{users.filter(u => !u.is_online).length}</p>
+                <p className="text-2xl font-bold font-display">{users.filter(u => getActivity(u) !== 'active').length}</p>
                 <p className="text-xs text-muted-foreground">Offline</p>
               </div>
             </div>
@@ -491,10 +495,11 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
                   <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                     <span>Joined: {formatDate(selectedUser.created_at)}</span>
                     <span>Last seen: {formatLastSeen(selectedUser.last_seen)}</span>
-                    <span className={`inline-flex items-center gap-1 ${selectedUser.is_online ? 'text-app-online' : ''}`}>
-                      <span className={`w-2 h-2 rounded-full ${selectedUser.is_online ? 'bg-app-online' : 'bg-muted-foreground'}`} />
-                      {selectedUser.is_online ? 'Online' : 'Offline'}
+                    <span className={`inline-flex items-center gap-1 ${getActivity(selectedUser) === 'active' ? 'text-app-online' : ''}`}>
+                      <span className={`w-2 h-2 rounded-full ${getActivity(selectedUser) === 'active' ? 'bg-app-online' : getActivity(selectedUser) === 'idle' ? 'bg-accent' : 'bg-muted-foreground'}`} />
+                      {getActivity(selectedUser) === 'active' ? 'Online' : getActivity(selectedUser) === 'idle' ? 'Idle' : 'Offline'}
                     </span>
+
                   </div>
                 </div>
               </div>

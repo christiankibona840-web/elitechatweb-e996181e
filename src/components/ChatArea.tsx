@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { fmtTime, fmtDate, isActiveNow, fmtLastSeen } from '@/lib/chatStore';
+import { usePresenceTick } from '@/hooks/usePresenceTick';
+
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
 import Avatar from './Avatar';
 import VoiceRecorder from './VoiceRecorder';
@@ -285,10 +287,26 @@ const ChatArea = ({ me, activeChat, onMessagesChanged, onBack }: ChatAreaProps) 
     });
   }, [activeChat, me.id]);
 
+  // Keep the header presence live: refresh on DB updates + re-render on a timer
+  usePresenceTick(20000);
+  useEffect(() => {
+    if (!activeChat || activeChat.type !== 'dm' || activeChat.id === LOVABLE_BOT_ID) return;
+    const contactId = activeChat.id;
+
+    const ch = supabase
+      .channel(`presence-${contactId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${contactId}`,
+      }, (payload) => setContactProfile(payload.new as Profile))
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [activeChat]);
+
   const loadContactProfile = async (id: string) => {
     const { data } = await supabase.from('profiles').select('*').eq('id', id).single();
     if (data) setContactProfile(data);
   };
+
 
   const loadGroupInfo = async (id: string) => {
     const { data } = await supabase.from('groups').select('*').eq('id', id).single();

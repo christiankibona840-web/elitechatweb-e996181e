@@ -5,6 +5,8 @@ import { UserPlus, Search, Check, Sparkles, X, MessageCircle } from 'lucide-reac
 import { toast } from 'sonner';
 import type { Tables } from '@/integrations/supabase/types';
 import { isActiveNow } from '@/lib/chatStore';
+import { usePresenceTick } from '@/hooks/usePresenceTick';
+
 
 type Profile = Tables<'profiles'>;
 
@@ -21,9 +23,24 @@ const PeoplePanel = ({ me, onStartChat }: PeoplePanelProps) => {
   const [addingId, setAddingId] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
+  usePresenceTick(20000);
+
   useEffect(() => {
     loadData();
   }, []);
+
+  // Apply live heartbeats so online dots / last-seen stay real
+  useEffect(() => {
+    const ch = supabase
+      .channel('people-presence')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles' }, (payload) => {
+        const p = payload.new as Profile;
+        setAllUsers(prev => prev.map(u => (u.id === p.id ? { ...u, ...p } : u)));
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
 
   const loadData = async () => {
     setLoading(true);
