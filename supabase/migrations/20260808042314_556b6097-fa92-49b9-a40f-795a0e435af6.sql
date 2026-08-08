@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.notify_all_on_event() FROM anon, public;
