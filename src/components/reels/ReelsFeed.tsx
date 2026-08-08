@@ -15,6 +15,8 @@ const ReelsFeed = ({ meId, canManage, onClose }: Props) => {
   const { reels, loading, reload } = useReels(meId);
   const [activeComments, setActiveComments] = useState<string | null>(null);
   const [showUpload, setShowUpload] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const viewed = useRef<Set<string>>(new Set());
 
