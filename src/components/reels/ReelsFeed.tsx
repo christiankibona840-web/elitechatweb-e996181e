@@ -137,43 +137,49 @@ const ReelsFeed = ({ meId, canManage, onClose }: Props) => {
                 <button onClick={() => like(r)} className="flex flex-col items-center gap-1">
                   <span
                     className={`grid h-11 w-11 place-items-center rounded-full transition-transform active:scale-90 ${
-                      r.liked ? 'bg-gradient-gold shadow-gold' : 'bg-black/45'
+                      r.liked ? 'bg-gradient-gold shadow-gold' : 'chip-legible'
                     }`}
                   >
                     <Heart size={20} className={r.liked ? 'fill-current text-primary-foreground' : 'text-foreground'} />
                   </span>
-                  <span className="text-[11px] font-semibold text-foreground">{r.likes}</span>
+                  <span className="text-[11px] font-bold text-foreground text-legible">{r.likes}</span>
                 </button>
                 <button
                   onClick={() => setActiveComments(r.id)}
                   className="flex flex-col items-center gap-1"
                 >
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-black/45">
+                  <span className="grid h-11 w-11 place-items-center rounded-full chip-legible">
                     <MessageCircle size={20} className="text-foreground" />
                   </span>
-                  <span className="text-[11px] font-semibold text-foreground">{r.comments}</span>
+                  <span className="text-[11px] font-bold text-foreground text-legible">{r.comments}</span>
                 </button>
                 <div className="flex flex-col items-center gap-1">
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-black/45">
+                  <span className="grid h-11 w-11 place-items-center rounded-full chip-legible">
                     <Eye size={20} className="text-foreground" />
                   </span>
-                  <span className="text-[11px] font-semibold text-foreground">{r.views}</span>
+                  <span className="text-[11px] font-bold text-foreground text-legible">{r.views}</span>
                 </div>
                 {(canManage || r.added_by === meId) && (
-                  <button onClick={() => remove(r)} className="grid h-11 w-11 place-items-center rounded-full bg-black/45">
+                  <button
+                    onClick={() => remove(r)}
+                    disabled={deleting === r.id}
+                    aria-label="Delete reel"
+                    className="grid h-11 w-11 place-items-center rounded-full chip-legible disabled:opacity-50"
+                  >
                     <Trash2 size={18} className="text-destructive" />
                   </button>
                 )}
               </div>
 
               {/* Caption */}
-              <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 to-transparent px-4 pb-8 pt-14">
+              <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/55 to-transparent px-4 pb-8 pt-16">
                 <div className="flex items-center gap-2">
                   <Avatar name={r.uploaderName} size={34} avatarUrl={r.uploaderAvatar} />
-                  <span className="text-sm font-semibold text-foreground">{r.uploaderName}</span>
+                  <span className="text-sm font-bold text-foreground text-legible">{r.uploaderName}</span>
                 </div>
-                {r.caption && <p className="mt-2 max-w-[80%] text-sm text-foreground/90">{r.caption}</p>}
+                {r.caption && <p className="mt-2 max-w-[80%] text-sm font-medium text-foreground text-legible">{r.caption}</p>}
               </div>
+
             </section>
           ))}
         </div>
