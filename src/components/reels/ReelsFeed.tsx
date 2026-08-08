@@ -51,11 +51,23 @@ const ReelsFeed = ({ meId, canManage, onClose }: Props) => {
   };
 
   const remove = async (r: ReelItem) => {
-    if (!/^https?:\/\//i.test(r.url)) await supabase.storage.from('chat-files').remove([r.url]);
-    await supabase.from('reels').delete().eq('id', r.id);
-    toast({ title: 'Reel removed' });
-    reload();
+    if (!window.confirm('Delete this reel permanently? Its likes and comments will be removed too.')) return;
+    setDeleting(r.id);
+    try {
+      await supabase.from('reel_comments').delete().eq('reel_id', r.id);
+      await supabase.from('reel_likes').delete().eq('reel_id', r.id);
+      const { error } = await supabase.from('reels').delete().eq('id', r.id);
+      if (error) throw error;
+      if (!/^https?:\/\//i.test(r.url)) await supabase.storage.from('chat-files').remove([r.url]);
+      toast({ title: 'Reel deleted' });
+      reload();
+    } catch (e: any) {
+      toast({ title: 'Delete failed', description: e.message, variant: 'destructive' });
+    } finally {
+      setDeleting(null);
+    }
   };
+
 
   return (
     <div className="fixed inset-0 z-50 bg-background">
