@@ -12,6 +12,7 @@ import SettingsPanel from './SettingsPanel';
 import PeoplePanel from './PeoplePanel';
 import ProjectZone from './ProjectZone';
 import LeadersHub from './LeadersHub';
+import EventsHub from './EventsHub';
 import GamesPanel from './games/GamesPanel';
 import NotificationBell from './NotificationBell';
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
@@ -50,7 +51,7 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
-  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games'>('chats');
+  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games' | 'events'>('chats');
 
   useEffect(() => {
     loadConversations();
@@ -213,6 +214,7 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
         <TabButton active={false} onClick={() => onOpenReels?.()} icon={<Film size={13} />} label="Reels" />
         <TabButton active={tab === 'people'} onClick={() => setTab('people')} icon={<Globe size={13} />} label="People" />
         <TabButton active={tab === 'games'} onClick={() => setTab('games')} icon={<Gamepad2 size={13} />} label="Games" />
+        <TabButton active={tab === 'events'} onClick={() => setTab('events')} icon={<CalendarDays size={13} />} label="Events" />
         <TabButton active={tab === 'status'} onClick={() => setTab('status')} icon={<Camera size={13} />} label="Status" />
         <TabButton active={tab === 'settings'} onClick={() => setTab('settings')} icon={<Settings size={13} />} label="Settings" />
       </div>
@@ -225,6 +227,8 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
         <PeoplePanel me={me} onStartChat={(userId) => { setTab('chats'); onSelectChat({ type: 'dm', id: userId }); }} />
       ) : tab === 'projects' ? (
         <ProjectZone me={me} />
+      ) : tab === 'events' ? (
+        <EventsHub me={me} />
       ) : tab === 'leaders' ? (
         <LeadersHub me={me} />
       ) : tab === 'games' ? (
