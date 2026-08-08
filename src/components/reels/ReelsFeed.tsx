@@ -76,7 +76,7 @@ const ReelsFeed = ({ meId, canManage, onClose }: Props) => {
       {/* Top bar */}
       <div className="absolute top-0 inset-x-0 z-20 flex items-center gap-3 px-4 py-3 bg-gradient-to-b from-background/95 to-transparent">
         <h2 className="font-display text-lg font-bold text-gradient-gold">Reels</h2>
-        <span className="text-xs text-muted-foreground">{reels.length} clips</span>
+        <span className="text-xs font-medium text-foreground/80 text-legible">{reels.length} clips</span>
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => setShowUpload(true)}
