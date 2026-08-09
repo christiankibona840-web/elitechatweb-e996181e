@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import AuthScreen from '@/components/AuthScreen';
-import ChatSidebar from '@/components/ChatSidebar';
+import ChatSidebar, { type SidebarTab } from '@/components/ChatSidebar';
+import RightNav from '@/components/RightNav';
 import ChatArea from '@/components/ChatArea';
 import UpdateAlert from '@/components/UpdateAlert';
 import AdminPortal from '@/components/AdminPortal';
 import ReelManagerPortal from '@/components/ReelManagerPortal';
 import AnnouncementBanner from '@/components/AnnouncementBanner';
-import ReelsPanel from '@/components/ReelsPanel';
 import ReelsFeed from '@/components/reels/ReelsFeed';
 import TicTacToeBoard from '@/components/games/TicTacToeBoard';
 import Connect4Board from '@/components/games/Connect4Board';
@@ -35,6 +35,7 @@ const Index = () => {
   const [activeGameId, setActiveGameId] = useState<string | null>(null);
   const [activeGameType, setActiveGameType] = useState<'ttt' | 'c4'>('ttt');
   const [showReels, setShowReels] = useState(false);
+  const [navTab, setNavTab] = useState<SidebarTab>('chats');
   const isMobile = useIsMobile();
 
   const openGame = useCallback((gameId: string, gameType: 'ttt' | 'c4' = 'ttt') => {
@@ -115,6 +116,9 @@ const Index = () => {
     window.addEventListener('focus', onActivity);
     window.addEventListener('pointerdown', onActivity);
     window.addEventListener('keydown', onActivity);
+    window.addEventListener('mousemove', onActivity);
+    window.addEventListener('scroll', onActivity, true);
+    window.addEventListener('touchstart', onActivity);
 
     return () => {
       clearInterval(interval);
@@ -122,6 +126,9 @@ const Index = () => {
       window.removeEventListener('focus', onActivity);
       window.removeEventListener('pointerdown', onActivity);
       window.removeEventListener('keydown', onActivity);
+      window.removeEventListener('mousemove', onActivity);
+      window.removeEventListener('scroll', onActivity, true);
+      window.removeEventListener('touchstart', onActivity);
       // Leaving the app (logout / unmount): stamp the real last-seen time
       beat(false, true);
     };
@@ -423,6 +430,8 @@ const Index = () => {
             onProfileUpdate={handleProfileUpdate}
             onOpenGame={openGame}
             onOpenReels={() => setShowReels(true)}
+            tab={navTab}
+            onTabChange={setNavTab}
           />
         )}
         {showReels && profile && (
@@ -454,7 +463,13 @@ const Index = () => {
             />
           )
         )}
-        {!isMobile && !activeGameId && <ReelsPanel />}
+        {!activeGameId && (
+          <RightNav
+            tab={navTab}
+            onChange={(t) => { setNavTab(t); if (isMobile) setActiveChat(null); }}
+            onOpenReels={() => setShowReels(true)}
+          />
+        )}
       </div>
     </div>
   );
