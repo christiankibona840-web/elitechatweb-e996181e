@@ -11,16 +11,19 @@ export function fmtTime(dateStr: string): string {
 export type Presence = 'active' | 'idle' | 'offline';
 
 /**
- * Active   = is_online flag set AND heartbeat within 2 minutes (truly in the web)
- * Idle     = is_online flag set BUT no recent heartbeat (forgot to log out / tab hidden)
+ * Active   = heartbeat within the last 5 minutes (really interacting with the app)
+ * Idle     = still flagged online but no heartbeat for 5+ minutes (forgot to sign out / tab left open)
  * Offline  = signed out
  */
+export const ACTIVE_WINDOW_MS = 5 * 60 * 1000;
+
 export function getPresence(isOnline?: boolean | null, lastSeen?: string | null): Presence {
   if (!isOnline) return 'offline';
   if (!lastSeen) return 'idle';
   const ageMs = Date.now() - new Date(lastSeen).getTime();
-  return ageMs < 2 * 60 * 1000 ? 'active' : 'idle';
+  return ageMs < ACTIVE_WINDOW_MS ? 'active' : 'idle';
 }
+
 
 export function fmtDate(dateStr: string): string {
   const now = new Date();
