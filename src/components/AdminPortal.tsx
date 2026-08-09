@@ -264,14 +264,10 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
     return formatDate(d);
   };
 
-  // "Truly active" = online flag AND heartbeat within last 2 minutes.
-  // Otherwise we consider them idle / probably forgot to log out.
-  const getActivity = (u: AdminUser): 'active' | 'idle' | 'offline' => {
-    if (!u.is_online) return 'offline';
-    if (!u.last_seen) return 'idle';
-    const ageMs = Date.now() - new Date(u.last_seen).getTime();
-    return ageMs < 2 * 60 * 1000 ? 'active' : 'idle';
-  };
+  // Shared presence rule: active = heartbeat within 5 min, idle = flagged online but stale.
+  const getActivity = (u: AdminUser): 'active' | 'idle' | 'offline' =>
+    getPresence(u.is_online, u.last_seen);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
