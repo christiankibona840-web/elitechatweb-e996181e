@@ -41,9 +41,12 @@ export function isActiveNow(isOnline?: boolean | null, lastSeen?: string | null)
 
 /** Human readable "last seen" text derived from the real heartbeat timestamp. */
 export function fmtLastSeen(lastSeen?: string | null, isOnline?: boolean | null): string {
-  if (isActiveNow(isOnline, lastSeen)) return 'online';
-  if (!lastSeen) return 'offline';
+  const presence = getPresence(isOnline, lastSeen);
+  if (presence === 'active') return 'online';
+  if (!lastSeen) return presence === 'idle' ? 'idle' : 'offline';
   const diff = Math.floor((Date.now() - new Date(lastSeen).getTime()) / 60000);
+  if (presence === 'idle') return `idle · last active ${diff < 60 ? `${diff}m` : `${Math.floor(diff / 60)}h`} ago`;
+
   if (diff < 1) return 'last seen just now';
   if (diff < 60) return `last seen ${diff}m ago`;
   if (diff < 1440) return `last seen ${Math.floor(diff / 60)}h ago`;
