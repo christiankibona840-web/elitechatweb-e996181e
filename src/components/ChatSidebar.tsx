@@ -31,7 +31,11 @@ interface ChatSidebarProps {
   onProfileUpdate: (profile: Profile) => void;
   onOpenGame?: (gameId: string, gameType?: 'ttt' | 'c4') => void;
   onOpenReels?: () => void;
+  tab: SidebarTab;
+  onTabChange: (tab: SidebarTab) => void;
 }
+
+export type SidebarTab = 'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games' | 'events';
 
 interface ConversationItem {
   type: 'dm' | 'group';
@@ -45,13 +49,14 @@ interface ConversationItem {
   avatarUrl?: string | null;
 }
 
-const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onProfileUpdate, onOpenGame, onOpenReels }: ChatSidebarProps) => {
+const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onProfileUpdate, onOpenGame, onOpenReels, tab, onTabChange }: ChatSidebarProps) => {
   const [search, setSearch] = useState('');
   const [copied, setCopied] = useState(false);
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
-  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games' | 'events'>('chats');
+  const setTab = onTabChange;
+
 
   useEffect(() => {
     loadConversations();
