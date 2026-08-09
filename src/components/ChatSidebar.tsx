@@ -213,16 +213,18 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-border flex-shrink-0 overflow-x-auto no-scrollbar">
-        <TabButton active={tab === 'chats'} onClick={() => setTab('chats')} icon={<MessageCircle size={13} />} label="Chats" />
-        <TabButton active={false} onClick={() => onOpenReels?.()} icon={<Film size={13} />} label="Reels" />
-        <TabButton active={tab === 'people'} onClick={() => setTab('people')} icon={<Globe size={13} />} label="People" />
-        <TabButton active={tab === 'games'} onClick={() => setTab('games')} icon={<Gamepad2 size={13} />} label="Games" />
-        <TabButton active={tab === 'events'} onClick={() => setTab('events')} icon={<CalendarDays size={13} />} label="Events" />
-        <TabButton active={tab === 'status'} onClick={() => setTab('status')} icon={<Camera size={13} />} label="Status" />
-        <TabButton active={tab === 'settings'} onClick={() => setTab('settings')} icon={<Settings size={13} />} label="Settings" />
+      {/* Section title — navigation now lives in the right-hand rail */}
+      <div className="flex items-center justify-between border-b border-border px-4 py-2 flex-shrink-0">
+        <span className="font-display text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          {tab === 'chats' ? 'Chats' : tab}
+        </span>
+        {tab !== 'chats' && (
+          <button onClick={() => setTab('chats')} className="text-[11px] font-semibold text-primary">
+            Back to chats
+          </button>
+        )}
       </div>
+
 
       {tab === 'status' ? (
         <StatusPanel me={me} />
