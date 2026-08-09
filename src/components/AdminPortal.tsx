@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { supabase } from '@/integrations/supabase/client';
-import { Trash2, LogOut, Shield, Users, Search, KeyRound, Ban, CheckCircle, MessageCircle, Megaphone, Hash, Users2, AlertTriangle, UserPlus, X } from 'lucide-react';
+import { Trash2, LogOut, Shield, Users, Search, KeyRound, Ban, CheckCircle, MessageCircle, Megaphone, Hash, Users2, AlertTriangle, UserPlus, X, Film } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import ApprovedIdsPanel from './admin/ApprovedIdsPanel';
 import GroupsPanel from './admin/GroupsPanel';
 import UserCommunitiesModal from './admin/UserCommunitiesModal';
+import ReelsModerationPanel from './admin/ReelsModerationPanel';
+import { SignedImg } from './SignedMedia';
 import { adminCreateUser } from '@/lib/admin-users.functions';
 import { usePresenceTick } from '@/hooks/usePresenceTick';
 
@@ -42,7 +44,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [blockedIds, setBlockedIds] = useState<Set<string>>(new Set());
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
-  const [tab, setTab] = useState<'users' | 'blocked' | 'announcements' | 'approved-ids' | 'groups'>('users');
+  const [tab, setTab] = useState<'users' | 'blocked' | 'announcements' | 'approved-ids' | 'groups' | 'reels'>('users');
   const [announcementTitle, setAnnouncementTitle] = useState('');
   const [announcementContent, setAnnouncementContent] = useState('');
   const [publishingAnnouncement, setPublishingAnnouncement] = useState(false);
@@ -405,13 +407,17 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'blocked' ? 'bg-destructive text-primary-foreground' : 'bg-card text-muted-foreground hover:text-foreground'}`}>
             <Ban size={14} className="inline mr-1.5" /> Blocked ({blockedIds.size})
           </button>
+          <button onClick={() => setTab('reels')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'reels' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:text-foreground'}`}>
+            <Film size={14} className="inline mr-1.5" /> Reels
+          </button>
           <button onClick={() => setTab('announcements')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === 'announcements' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:text-foreground'}`}>
             <Megaphone size={14} className="inline mr-1.5" /> Announcements
           </button>
         </div>
 
-        {tab === 'approved-ids' ? <ApprovedIdsPanel /> : tab === 'groups' ? <GroupsPanel /> : tab === 'announcements' ? (
+        {tab === 'approved-ids' ? <ApprovedIdsPanel /> : tab === 'groups' ? <GroupsPanel /> : tab === 'reels' ? <ReelsModerationPanel /> : tab === 'announcements' ? (
           <div className="space-y-4">
             <div className="bg-card border border-border rounded-xl p-5">
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
@@ -483,7 +489,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-xl font-bold overflow-hidden">
                   {selectedUser.avatar_url ? (
-                    <img src={selectedUser.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <SignedImg src={selectedUser.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
                     selectedUser.display_name.charAt(0).toUpperCase()
                   )}
@@ -590,7 +596,7 @@ const AdminPortal = ({ onLogout, onBackToChoice }: AdminPortalProps) => {
                           <div className="relative">
                             <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold overflow-hidden">
                               {user.avatar_url ? (
-                                <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                                <SignedImg src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                               ) : (
                                 user.display_name.charAt(0).toUpperCase()
                               )}
