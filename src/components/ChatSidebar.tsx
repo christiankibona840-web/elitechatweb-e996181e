@@ -16,7 +16,7 @@ import EventsHub from './EventsHub';
 import GamesPanel from './games/GamesPanel';
 import NotificationBell from './NotificationBell';
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
-import { LogOut, Search, UserPlus, Users, MessageCircle, Camera, Settings, Globe, Rocket, Gamepad2, Code, Crown, Film, CalendarDays } from 'lucide-react';
+import { LogOut, Search, UserPlus, Users, Code } from 'lucide-react';
 
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -336,26 +336,5 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
     </div>
   );
 };
-
-const TabButton = ({
-  active,
-  onClick,
-  icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}) => (
-  <button
-    onClick={onClick}
-    className={`flex-1 min-w-[60px] py-2.5 text-[10px] font-semibold uppercase tracking-wider flex items-center justify-center gap-1 transition-colors ${
-      active ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'
-    }`}
-  >
-    {icon} {label}
-  </button>
-);
 
 export default ChatSidebar;
