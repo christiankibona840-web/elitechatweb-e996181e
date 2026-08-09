@@ -823,6 +823,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          edited_at: string | null
           id: string
           reel_id: string
           user_id: string
@@ -830,6 +831,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           reel_id: string
           user_id: string
@@ -837,6 +839,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           reel_id?: string
           user_id?: string
