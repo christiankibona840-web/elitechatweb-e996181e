@@ -16,7 +16,7 @@ import EventsHub from './EventsHub';
 import GamesPanel from './games/GamesPanel';
 import NotificationBell from './NotificationBell';
 import { LOVABLE_BOT_ID, LOVABLE_BOT_PROFILE } from '@/lib/lovableBot';
-import { LogOut, Search, UserPlus, Users, MessageCircle, Camera, Settings, Globe, Rocket, Gamepad2, Code, Crown, Film, CalendarDays } from 'lucide-react';
+import { LogOut, Search, UserPlus, Users, Code } from 'lucide-react';
 
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -31,7 +31,11 @@ interface ChatSidebarProps {
   onProfileUpdate: (profile: Profile) => void;
   onOpenGame?: (gameId: string, gameType?: 'ttt' | 'c4') => void;
   onOpenReels?: () => void;
+  tab: SidebarTab;
+  onTabChange: (tab: SidebarTab) => void;
 }
+
+export type SidebarTab = 'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games' | 'events';
 
 interface ConversationItem {
   type: 'dm' | 'group';
@@ -45,13 +49,14 @@ interface ConversationItem {
   avatarUrl?: string | null;
 }
 
-const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onProfileUpdate, onOpenGame, onOpenReels }: ChatSidebarProps) => {
+const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onProfileUpdate, onOpenGame, onOpenReels, tab, onTabChange }: ChatSidebarProps) => {
   const [search, setSearch] = useState('');
   const [copied, setCopied] = useState(false);
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const [showCreateGroup, setShowCreateGroup] = useState(false);
-  const [tab, setTab] = useState<'chats' | 'status' | 'people' | 'settings' | 'projects' | 'leaders' | 'games' | 'events'>('chats');
+  const setTab = onTabChange;
+
 
   useEffect(() => {
     loadConversations();
@@ -208,16 +213,18 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-border flex-shrink-0 overflow-x-auto no-scrollbar">
-        <TabButton active={tab === 'chats'} onClick={() => setTab('chats')} icon={<MessageCircle size={13} />} label="Chats" />
-        <TabButton active={false} onClick={() => onOpenReels?.()} icon={<Film size={13} />} label="Reels" />
-        <TabButton active={tab === 'people'} onClick={() => setTab('people')} icon={<Globe size={13} />} label="People" />
-        <TabButton active={tab === 'games'} onClick={() => setTab('games')} icon={<Gamepad2 size={13} />} label="Games" />
-        <TabButton active={tab === 'events'} onClick={() => setTab('events')} icon={<CalendarDays size={13} />} label="Events" />
-        <TabButton active={tab === 'status'} onClick={() => setTab('status')} icon={<Camera size={13} />} label="Status" />
-        <TabButton active={tab === 'settings'} onClick={() => setTab('settings')} icon={<Settings size={13} />} label="Settings" />
+      {/* Section title — navigation now lives in the right-hand rail */}
+      <div className="flex items-center justify-between border-b border-border px-4 py-2 flex-shrink-0">
+        <span className="font-display text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          {tab === 'chats' ? 'Chats' : tab}
+        </span>
+        {tab !== 'chats' && (
+          <button onClick={() => setTab('chats')} className="text-[11px] font-semibold text-primary">
+            Back to chats
+          </button>
+        )}
       </div>
+
 
       {tab === 'status' ? (
         <StatusPanel me={me} />
@@ -304,22 +311,6 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">{copied ? '✅ Copied!' : 'Click to copy'}</div>
             </div>
-            <button
-              onClick={() => setTab('projects')}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors text-muted-foreground hover:bg-muted/30 hover:text-foreground"
-              title="Project Zone"
-            >
-              <Rocket size={18} />
-              <span className="text-[9px] font-semibold uppercase tracking-wider">Projects</span>
-            </button>
-            <button
-              onClick={() => setTab('leaders')}
-              className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors text-muted-foreground hover:bg-muted/30 hover:text-foreground"
-              title="Leaders Hub"
-            >
-              <Crown size={18} />
-              <span className="text-[9px] font-semibold uppercase tracking-wider">Leaders</span>
-            </button>
             <a
               href="https://chris-p7a0.onrender.com"
 
@@ -345,26 +336,5 @@ const ChatSidebar = ({ me, activeChat, onSelectChat, onLogout, refreshKey, onPro
     </div>
   );
 };
-
-const TabButton = ({
-  active,
-  onClick,
-  icon,
-  label,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}) => (
-  <button
-    onClick={onClick}
-    className={`flex-1 min-w-[60px] py-2.5 text-[10px] font-semibold uppercase tracking-wider flex items-center justify-center gap-1 transition-colors ${
-      active ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'
-    }`}
-  >
-    {icon} {label}
-  </button>
-);
 
 export default ChatSidebar;
