@@ -12,68 +12,68 @@
 
 :root {
   /* Core semantic palette (HSL channels) */
-  --background: 0 0% 0%;
-  --foreground: 0 0% 100%;
-  --card: 0 0% 6%;
-  --card-foreground: 0 0% 100%;
-  --popover: 0 0% 8%;
-  --popover-foreground: 0 0% 100%;
-  --primary: 108 100% 54%;
-  --primary-foreground: 0 0% 0%;
-  --secondary: 0 0% 14%;
+  --background: 268 32% 7%;
+  --foreground: 320 20% 97%;
+  --card: 268 28% 11%;
+  --card-foreground: 320 20% 97%;
+  --popover: 268 28% 13%;
+  --popover-foreground: 320 20% 97%;
+  --primary: 330 77% 59%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 248 74% 63%;
   --secondary-foreground: 0 0% 100%;
-  --muted: 0 0% 13%;
-  --muted-foreground: 0 0% 70%;
-  --accent: 108 100% 54%;
-  --accent-foreground: 0 0% 0%;
+  --muted: 268 20% 17%;
+  --muted-foreground: 300 12% 74%;
+  --accent: 16 100% 60%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 72% 55%;
   --destructive-foreground: 0 0% 100%;
-  --border: 0 0% 18%;
-  --input: 0 0% 14%;
-  --ring: 108 100% 54%;
+  --border: 285 20% 22%;
+  --input: 268 20% 18%;
+  --ring: 330 77% 59%;
 
   --radius: 1.15rem;
   --bubble-radius: 20px;
 
   /* App tokens */
-  --app-primary: 108 100% 54%;
-  --app-primary-dark: 108 80% 38%;
-  --app-accent: 108 100% 54%;
-  --app-accent-light: 108 100% 70%;
-  --app-bubble-out: 108 100% 54%;
-  --app-bubble-out-text: 0 0% 0%;
-  --app-panel: 0 0% 4%;
-  --app-chat-bg: 0 0% 2%;
-  --app-bubble-in: 0 0% 13%;
-  --app-header: 0 0% 6%;
-  --app-input-bg: 0 0% 11%;
-  --app-online: 108 100% 54%;
-  --app-icon: 0 0% 80%;
+  --app-primary: 330 77% 59%;
+  --app-primary-dark: 330 65% 44%;
+  --app-accent: 16 100% 60%;
+  --app-accent-light: 33 93% 60%;
+  --app-bubble-out: 330 70% 62%;
+  --app-bubble-out-text: 0 0% 100%;
+  --app-panel: 268 28% 10%;
+  --app-chat-bg: 268 32% 8%;
+  --app-bubble-in: 268 22% 18%;
+  --app-header: 268 28% 13%;
+  --app-input-bg: 268 22% 17%;
+  --app-online: 152 68% 50%;
+  --app-icon: 310 15% 80%;
 
   /* Brand tokens */
-  --brand-primary: 108 100% 54%;
-  --brand-secondary: 0 0% 100%;
-  --brand-accent: 108 100% 54%;
-  --brand-light: 0 0% 100%;
-  --brand-dark: 0 0% 0%;
+  --brand-primary: 330 77% 59%;
+  --brand-secondary: 248 74% 63%;
+  --brand-accent: 16 100% 60%;
+  --brand-light: 320 20% 98%;
+  --brand-dark: 268 32% 7%;
 
   /* Gradients & shadows */
-  --gradient-hero: linear-gradient(135deg, hsl(0 0% 0%) 0%, hsl(0 0% 8%) 60%, hsl(108 100% 54% / 0.35) 100%);
-  --gradient-gold: linear-gradient(135deg, hsl(108 100% 54%), hsl(108 100% 70%) 50%, hsl(0 0% 100%));
-  --gradient-blush: linear-gradient(135deg, hsl(108 100% 54% / 0.18), hsl(0 0% 100% / 0.06));
+  --gradient-hero: linear-gradient(135deg, hsl(16 100% 60% / 0.9) 0%, hsl(330 77% 59% / 0.85) 55%, hsl(248 74% 63% / 0.85) 100%);
+  --gradient-gold: linear-gradient(135deg, hsl(16 100% 60%), hsl(33 93% 54%) 45%, hsl(330 77% 59%));
+  --gradient-blush: linear-gradient(135deg, hsl(330 77% 59% / 0.25), hsl(248 74% 63% / 0.25));
   --shadow-gold: 0 10px 30px hsl(var(--primary) / 0.35);
   --shadow-gold-strong: 0 18px 45px hsl(var(--primary) / 0.55);
   --shadow-elegant: 0 24px 70px hsl(268 60% 3% / 0.55);
 
   /* Sidebar */
-  --sidebar: 0 0% 4%;
-  --sidebar-foreground: 0 0% 100%;
-  --sidebar-primary: 108 100% 54%;
-  --sidebar-primary-foreground: 0 0% 0%;
-  --sidebar-accent: 0 0% 11%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 0 0% 18%;
-  --sidebar-ring: 108 100% 54%;
+  --sidebar: 268 28% 10%;
+  --sidebar-foreground: 320 20% 97%;
+  --sidebar-primary: 330 77% 59%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 268 22% 17%;
+  --sidebar-accent-foreground: 320 20% 97%;
+  --sidebar-border: 285 20% 22%;
+  --sidebar-ring: 330 77% 59%;
 }
 
 
@@ -191,11 +191,11 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Outfit', 'General Sans', system-ui, -apple-system, sans-serif;
+    font-family: 'Figtree', system-ui, -apple-system, sans-serif;
     letter-spacing: -0.005em;
   }
   h1, h2, h3, .font-display {
-    font-family: 'General Sans', 'Outfit', system-ui, sans-serif;
+    font-family: 'Outfit', 'Figtree', system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
 
