@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.cleanup_message_refs() FROM PUBLIC, anon, authenticated;
